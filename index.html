@@ -2,273 +2,285 @@
 <html lang="my">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>ငွေစာရင်း - Daily Money Tracker</title>
 
-<!-- သင့် App Icon နှင့် Manifest ချိတ်ဆက်မှု -->
 <link rel="apple-touch-icon" href="icon.png">
 <link rel="icon" type="image/png" href="icon.png">
 <link rel="manifest" href="manifest.json">
 
 <style>
-  * { box-sizing: border-box; margin: 0; padding: 0; }
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
   body {
     font-family: 'Pyidaungsu', 'Myanmar Text', 'Segoe UI', sans-serif;
     background: #f0f2f5;
     color: #1c1e21;
-    padding-bottom: 110px;
-    -webkit-tap-highlight-color: transparent;
+    padding-bottom: 110px; /* Ad Space အတွက် နေရာချန်ထား */
   }
+  
+  /* Header */
   .app-header {
     background: linear-gradient(135deg, #4b6cb7, #182848);
     color: #fff;
     padding: 18px 16px;
     text-align: center;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+    box-shadow: 0 3px 8px rgba(0,0,0,0.15);
     position: relative;
+    cursor: pointer; 
+    border-bottom-left-radius: 16px;
+    border-bottom-right-radius: 16px;
   }
-  .app-header h1 { font-size: 20px; }
+  .app-header h1 { font-size: 20px; font-weight: bold; }
   .app-header p { font-size: 12px; opacity: 0.85; margin-top: 4px; }
   .user-info {
     position: absolute; top: 15px; right: 15px; font-size: 11px;
-    background: rgba(255,255,255,0.2); padding: 4px 8px; border-radius: 12px;
-    cursor: pointer;
+    background: rgba(255,255,255,0.2); padding: 5px 10px; border-radius: 20px;
+    cursor: pointer; font-weight: bold;
   }
 
   .container { max-width: 600px; margin: 0 auto; padding: 14px; }
 
+  /* ယနေ့ စာရင်း ကတ်များ */
   .summary-grid {
-    display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 16px;
+    display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 16px;
   }
   .summary-card {
-    background: #fff; border-radius: 12px; padding: 12px 8px; text-align: center;
-    box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+    background: #fff; border-radius: 12px; padding: 12px 6px; text-align: center;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.05);
   }
-  .summary-card .label { font-size: 11px; color: #65676b; }
-  .summary-card .value { font-size: 15px; font-weight: bold; margin-top: 6px; }
+  .summary-card .label { font-size: 11px; color: #65676b; margin-bottom: 4px; }
+  .summary-card .value { font-size: 14px; font-weight: bold; }
   .income-color { color: #1a8917; }
   .expense-color { color: #d93025; }
   .balance-color { color: #1a73e8; }
 
-  .month-box, .form-box, .list-box, .report-box, .admin-box {
-    background: #fff; border-radius: 12px; padding: 14px; margin-bottom: 16px;
-    box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+  /* မှတ်တမ်းအသစ်ထည့်ရန် ဖောင် (အပေါ်ရွှေ့ထားသည်) */
+  .form-box {
+    background: #fff; border-radius: 16px; padding: 16px; margin-bottom: 16px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.08);
   }
-  .month-box h3, .form-box h3, .list-box h3, .report-box h3, .admin-box h3 {
-    font-size: 15px; margin-bottom: 10px; color: #182848;
-  }
-  .month-row { display: flex; justify-content: space-between; font-size: 13px; padding: 4px 0; }
-
-  .type-toggle { display: flex; gap: 8px; margin-bottom: 12px; }
+  .form-box h3 { font-size: 15px; margin-bottom: 12px; color: #182848; text-align: center; }
+  
+  .type-toggle { display: flex; gap: 8px; margin-bottom: 12px; background: #e4e6eb; padding: 4px; border-radius: 10px; }
   .type-toggle button {
-    flex: 1; padding: 10px; border: none; border-radius: 8px; font-size: 14px;
-    cursor: pointer; background: #e4e6eb; color: #1c1e21; font-weight: 600;
+    flex: 1; padding: 12px; border: none; border-radius: 8px; font-size: 14px;
+    cursor: pointer; background: transparent; color: #65676b; font-weight: bold; transition: all 0.2s;
   }
-  .type-toggle button.active-income { background: #1a8917; color: #fff; }
-  .type-toggle button.active-expense { background: #d93025; color: #fff; }
+  .type-toggle button.active-income { background: #1a8917; color: #fff; box-shadow: 0 2px 6px rgba(26,137,23,0.3); }
+  .type-toggle button.active-expense { background: #d93025; color: #fff; box-shadow: 0 2px 6px rgba(217,48,37,0.3); }
 
-  .form-group { margin-bottom: 10px; }
-  .form-group label { display: block; font-size: 12px; color: #65676b; margin-bottom: 4px; }
+  .form-group { margin-bottom: 12px; }
+  .form-group label { display: block; font-size: 12px; color: #182848; font-weight: bold; margin-bottom: 4px; }
   .form-group input, .form-group select, .form-group textarea {
-    width: 100%; padding: 10px; border: 1px solid #ccd0d5;
-    border-radius: 8px; font-size: 14px; font-family: inherit;
+    width: 100%; padding: 12px; border: 1.5px solid #ccd0d5;
+    border-radius: 8px; font-size: 14px; font-family: inherit; background: #f9f9f9;
   }
-  .form-group textarea { resize: vertical; min-height: 44px; }
+  .form-group input:focus, .form-group select:focus, .form-group textarea:focus {
+    border-color: #4b6cb7; outline: none; background: #fff;
+  }
+  
+  /* ပမာဏ ထည့်ရန် အကွက် */
+  .amount-input { font-size: 24px !important; font-weight: bold; color: #182848; text-align: center; letter-spacing: 1px; padding: 16px 12px !important; }
+  
   .save-btn {
-    width: 100%; padding: 12px; background: #4b6cb7; color: #fff;
-    border: none; border-radius: 8px; font-size: 15px; font-weight: bold; cursor: pointer; margin-top: 4px;
+    width: 100%; padding: 14px; background: #4b6cb7; color: #fff;
+    border: none; border-radius: 10px; font-size: 15px; font-weight: bold; cursor: pointer;
+    box-shadow: 0 4px 10px rgba(75,108,183,0.3); transition: transform 0.1s;
   }
-  .save-btn:active { background: #182848; }
+  .save-btn:active { transform: scale(0.98); }
+  .save-btn:disabled { background: #a0a0a0; cursor: not-allowed; box-shadow: none; }
 
+  /* မှတ်တမ်းစာရင်း */
+  .list-box {
+    background: #fff; border-radius: 16px; padding: 16px; margin-bottom: 16px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+  }
+  .list-box h3 { font-size: 15px; margin-bottom: 12px; color: #182848; }
   .record-item {
     display: flex; justify-content: space-between; align-items: center;
-    padding: 10px 0; border-bottom: 1px solid #f0f2f5; font-size: 13px;
+    padding: 12px 0; border-bottom: 1px solid #f0f2f5; font-size: 13px;
   }
   .record-item:last-child { border-bottom: none; }
-  .record-left .cat { font-weight: 600; }
-  .record-left .meta { font-size: 11px; color: #8a8d91; margin-top: 2px; }
+  .record-left .cat { font-weight: bold; color: #1c1e21; }
+  .record-left .meta { font-size: 11px; color: #8a8d91; margin-top: 4px; }
+  .record-right { text-align: right; display: flex; align-items: center; gap: 8px; }
   .record-right .amt { font-weight: bold; font-size: 14px; }
   .delete-btn {
-    background: none; border: none; color: #d93025; cursor: pointer; font-size: 16px; margin-left: 8px;
+    background: #ffeaea; border: none; color: #d93025; cursor: pointer;
+    font-size: 12px; padding: 6px 10px; border-radius: 6px; font-weight: bold;
   }
   .empty-msg { text-align: center; color: #8a8d91; font-size: 13px; padding: 16px 0; }
 
-  /* Reports */
+  /* Tabs */
+  .tabs { display: flex; gap: 6px; margin-bottom: 16px; }
+  .tabs button {
+    flex: 1; padding: 10px; border: none; border-radius: 10px; font-size: 13px;
+    font-weight: bold; cursor: pointer; background: #fff; color: #65676b;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.05); transition: all 0.2s;
+  }
+  .tabs button.active { background: #182848; color: #fff; }
+  .tab-content { display: none; animation: fadeIn 0.3s ease; }
+  .tab-content.active { display: block; }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+
+  /* Reports & Admin */
+  .report-box, .admin-box {
+    background: #fff; border-radius: 16px; padding: 16px; margin-bottom: 16px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+  }
+  .report-box h3, .admin-box h3 { font-size: 15px; margin-bottom: 12px; color: #182848; }
   .report-controls { display: flex; gap: 8px; margin-bottom: 12px; flex-wrap: wrap; }
   .report-controls select, .report-controls button {
-    padding: 8px 12px; border-radius: 8px; border: 1px solid #ccd0d5;
-    font-size: 13px; font-family: inherit; background: #fff; cursor: pointer;
+    padding: 8px 12px; border-radius: 8px; border: 1.5px solid #ccd0d5;
+    font-size: 13px; font-family: inherit; background: #fff; cursor: pointer; font-weight: bold;
   }
   .report-controls button { background: #4b6cb7; color: #fff; border: none; }
+  
+  /* လစဉ်ဇယား */
   .report-table { width: 100%; border-collapse: collapse; font-size: 12px; margin-top: 8px; }
-  .report-table th, .report-table td {
-    padding: 6px 4px; border-bottom: 1px solid #f0f2f5; text-align: left;
-  }
-  .report-table th { background: #f5f6f7; font-weight: 600; color: #182848; }
-  .report-table td.amount { text-align: right; }
+  .report-table th, .report-table td { padding: 8px 6px; border-bottom: 1px solid #eee; text-align: left; }
+  .report-table th { background: #f8f9fa; font-weight: bold; color: #182848; }
+  .report-table td.amount { text-align: right; font-weight: bold; }
+  .table-summary { background: #f0f4ff; padding: 10px; border-radius: 8px; margin-bottom: 10px; font-size: 13px; line-height: 1.5; }
 
-  /* Admin */
+  /* Admin Panel */
   .admin-box { border: 2px solid #4b6cb7; }
-  .admin-box input { margin-bottom: 8px; }
-  .video-preview {
-    margin-top: 10px; border-radius: 8px; overflow: hidden; background: #000; text-align: center;
-  }
-  .video-preview video { width: 100%; max-height: 200px; display: block; }
+  .admin-box input { margin-bottom: 10px; }
+  .video-preview { margin-top: 10px; border-radius: 8px; overflow: hidden; background: #000; text-align: center; }
+  .video-preview video { width: 100%; max-height: 150px; display: block; }
   .video-item {
     display: flex; justify-content: space-between; align-items: center;
     padding: 8px 0; border-bottom: 1px solid #f0f2f5; font-size: 13px;
   }
-  .video-item .vid-name { font-weight: 600; color: #182848; }
+  .video-item .vid-name { font-weight: bold; color: #182848; }
   .video-item .vid-meta { font-size: 11px; color: #8a8d91; margin-top: 2px; }
 
-  /* Ad Space with Overlay Design */
+  /* ကြော်ငြာနေရာ (ပိုမိုကျဉ်းမြောင်းစေရန်) */
   .ad-container {
     position: fixed; bottom: 0; left: 0; right: 0; background: #000;
-    border-top: 1px solid #e4e6eb; box-shadow: 0 -2px 10px rgba(0,0,0,0.15);
-    z-index: 1000; display: flex; flex-direction: column;
-    width: 100%; max-height: 200px;
+    border-top: 1px solid #e4e6eb; box-shadow: 0 -4px 15px rgba(0,0,0,0.2);
+    z-index: 1000; display: flex; flex-direction: column; width: 100%; max-height: 130px; /* အမြင့်လျှော့ချထားသည် */
   }
   .ad-video-wrapper {
-    position: relative; width: 100%; height: 150px; background: #000;
-    display: flex; justify-content: center; align-items: center; overflow: hidden;
+    position: relative; width: 100%; height: 100px; /* အမြင့်လျှော့ချထားသည် */
+    background: #000; display: flex; justify-content: center; align-items: center; overflow: hidden;
   }
-  .ad-video-wrapper video {
-    width: 100%; height: 100%; object-fit: contain;
-  }
+  .ad-video-wrapper video { width: 100%; height: 100%; object-fit: contain; }
+  
+  /* Video ပေါ်က စာသား */
   .ad-overlay-info {
     position: absolute; bottom: 0; left: 0; right: 0;
-    background: linear-gradient(to top, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.5) 60%, transparent 100%);
-    padding: 25px 12px 8px 12px;
-    color: #fff; pointer-events: none; text-align: left;
+    background: linear-gradient(to top, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.4) 60%, transparent 100%);
+    padding: 20px 10px 6px 10px; color: #fff; pointer-events: none; text-align: left;
   }
-  .ad-overlay-info .title {
-    font-size: 14px; font-weight: bold; margin-bottom: 3px;
-    text-shadow: 1px 1px 3px rgba(0,0,0,0.8); line-height: 1.2;
-  }
-  .ad-overlay-info .desc {
-    font-size: 11px; color: #e4e6eb; line-height: 1.3;
-    text-shadow: 1px 1px 2px rgba(0,0,0,0.8);
-  }
-  .ad-placeholder {
-    font-size: 11px; color: #8a8d91; width: 100%; padding: 20px; text-align: center;
-    cursor: pointer;
-  }
-
-  /* Tabs */
-  .tabs { display: flex; gap: 6px; margin-bottom: 14px; }
-  .tabs button {
-    flex: 1; padding: 10px; border: none; border-radius: 8px; font-size: 13px;
-    font-weight: 600; cursor: pointer; background: #e4e6eb; color: #1c1e21;
-  }
-  .tabs button.active { background: #4b6cb7; color: #fff; }
-  .tab-content { display: none; }
-  .tab-content.active { display: block; }
+  .ad-overlay-info .title { font-size: 12px; font-weight: bold; margin-bottom: 2px; }
+  .ad-overlay-info .desc { font-size: 10px; color: #ddd; }
+  .ad-placeholder { font-size: 11px; color: #8a8d91; width: 100%; padding: 15px; text-align: center; }
 
   /* Modals */
   .modal-overlay {
     display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0;
-    background: rgba(0,0,0,0.5); z-index: 2000; align-items: center; justify-content: center;
+    background: rgba(0,0,0,0.6); z-index: 2000; align-items: center; justify-content: center;
+    backdrop-filter: blur(3px);
   }
   .modal-overlay.show { display: flex; }
   .modal-box {
-    background: #fff; border-radius: 14px; padding: 20px; width: 90%; max-width: 360px; text-align: center;
+    background: #fff; border-radius: 14px; padding: 20px; width: 90%; max-width: 340px; text-align: center;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.2);
   }
   .modal-box h3 { font-size: 16px; margin-bottom: 12px; color: #182848; }
   .modal-box input {
-    width: 100%; padding: 10px; border: 1px solid #ccd0d5; border-radius: 8px;
-    font-size: 14px; margin-bottom: 10px; font-family: inherit;
+    width: 100%; padding: 12px; border: 1.5px solid #ccd0d5; border-radius: 8px;
+    font-size: 14px; margin-bottom: 10px; font-family: inherit; background: #f9f9f9;
   }
-  .modal-box .btn-row { display: flex; gap: 8px; }
+  .modal-box .btn-row { display: flex; gap: 8px; margin-top: 8px; }
   .modal-box button {
-    flex: 1; padding: 10px; border: none; border-radius: 8px; font-size: 14px;
-    font-weight: 600; cursor: pointer; font-family: inherit;
+    flex: 1; padding: 12px; border: none; border-radius: 8px; font-size: 14px;
+    font-weight: bold; cursor: pointer; font-family: inherit;
   }
   .modal-box .btn-primary { background: #4b6cb7; color: #fff; }
   .modal-box .btn-cancel { background: #e4e6eb; color: #1c1e21; }
-  .modal-box .switch-text {
-    font-size: 12px; color: #65676b; margin-top: 12px; cursor: pointer; text-decoration: underline;
-  }
+  .modal-box .switch-text { font-size: 12px; color: #4b6cb7; margin-top: 12px; cursor: pointer; text-decoration: underline; font-weight: bold; }
 
   .contact-box {
     background: #eef2ff; border: 1px solid #c7d2fe; border-radius: 10px;
-    padding: 12px; margin-bottom: 12px; font-size: 12px; color: #1e3a8a; text-align: center;
+    padding: 12px; margin-bottom: 16px; font-size: 12px; color: #1e3a8a; text-align: center; line-height: 1.5;
   }
-  .contact-box a { color: #1a73e8; font-weight: bold; text-decoration: none; }
   .email-text {
     display: inline-block; background: #fff; padding: 4px 10px; border-radius: 6px;
-    margin-top: 6px; border: 1px solid #c7d2fe; font-family: monospace; font-size: 13px;
+    margin-top: 6px; border: 1px solid #c7d2fe; font-family: monospace; font-size: 13px; font-weight: bold;
   }
 </style>
 </head>
 <body>
 
-<!-- Authentication Modal (Login & Signup Combined) -->
+<!-- Auth Modal -->
 <div class="modal-overlay" id="authModal">
   <div class="modal-box">
-    <!-- Sign Up Section -->
     <div id="signupSection" style="display:none;">
-      <h3>📝 အကောင့်အသစ်ဖွင့်ရန် (Sign Up)</h3>
-      <p style="font-size:12px; color:#65676b; margin-bottom:15px;">ဖုန်းနံပါတ်တစ်ခုလျှင် အကောင့်တစ်ခုသာ ဖွင့်နိုင်ပါမည်။</p>
+      <h3>📝 အကောင့်အသစ်ဖွင့်ရန်</h3>
+      <p style="font-size:12px; color:#65676b; margin-bottom:12px;">ဖုန်းနံပါတ်တစ်ခုလျှင် အကောင့်တစ်ခုသာ ဖွင့်နိုင်ပါမည်။</p>
       <input type="text" id="signupName" placeholder="သင့်နာမည်">
-      <input type="tel" id="signupPhone" placeholder="မြန်မာဖုန်းနံပါတ် (ဥပမာ- 09xxxxxxxxx)">
-      <div class="btn-row" style="margin-top:10px;">
-        <button class="btn-primary" onclick="registerUser()">အကောင့်ဖွင့်မည်</button>
+      <input type="tel" id="signupPhone" placeholder="ဖုန်းနံပါတ် (09xxxxxxxxx)">
+      <div class="btn-row">
+        <button class="btn-primary" onclick="registerUser()">✅ အကောင့်ဖွင့်မည်</button>
       </div>
-      <p class="switch-text" onclick="toggleAuthMode('login')">အကောင့်ရှိပြီးသားလား? Login ဝင်ရန် နှိပ်ပါ</p>
+      <p class="switch-text" onclick="toggleAuthMode('login')">အကောင့်ရှိပြီးသားလား? ဝင်ရန် နှိပ်ပါ</p>
     </div>
 
-    <!-- Login Section -->
     <div id="loginSection" style="display:none;">
-      <h3>👋 ပြန်လည်ကြိုဆိုပါတယ် (Login)</h3>
-      <p style="font-size:12px; color:#65676b; margin-bottom:15px;">သင့်ဖုန်းနံပါတ်ဖြင့် ဝင်ရောက်ပါ</p>
-      <input type="tel" id="loginPhone" placeholder="မြန်မာဖုန်းနံပါတ် (ဥပမာ- 09xxxxxxxxx)">
-      <div class="btn-row" style="margin-top:10px;">
-        <button class="btn-primary" onclick="loginUser()">ဝင်မည်</button>
+      <h3>👋 ပြန်လည်ကြိုဆိုပါတယ်</h3>
+      <p style="font-size:12px; color:#65676b; margin-bottom:12px;">သင့်ဖုန်းနံပါတ်ဖြင့် ဝင်ရောက်ပါ</p>
+      <input type="tel" id="loginPhone" placeholder="ဖုန်းနံပါတ် (09xxxxxxxxx)">
+      <div class="btn-row">
+        <button class="btn-primary" onclick="loginUser()">✅ ဝင်မည်</button>
       </div>
-      <p class="switch-text" onclick="toggleAuthMode('signup')">အကောင့်မရှိသေးဘူးလား? Sign Up လုပ်ရန် နှိပ်ပါ</p>
+      <p class="switch-text" onclick="toggleAuthMode('signup')">အကောင့်မရှိသေးဘူးလား? အသစ်ဖွင့်ရန် နှိပ်ပါ</p>
     </div>
   </div>
 </div>
 
-<!-- Admin Login Modal -->
+<!-- Admin Modal -->
 <div class="modal-overlay" id="adminLoginModal">
   <div class="modal-box">
     <h3>🔐 Admin Login</h3>
     <input type="password" id="adminPassword" placeholder="Password ထည့်ပါ" onkeydown="if(event.key==='Enter') loginAdmin()">
     <div class="btn-row">
-      <button class="btn-cancel" onclick="closeAdminLogin()">မလုပ်တော့</button>
+      <button class="btn-cancel" onclick="closeAdminLogin()">မလုပ်တော့ပါ</button>
       <button class="btn-primary" onclick="loginAdmin()">ဝင်မည်</button>
     </div>
   </div>
 </div>
 
-<div class="app-header">
+<!-- Header -->
+<div class="app-header" onclick="handleAdminClick()">
   <h1>💰 ငွေစာရင်း</h1>
-  <p>နေ့စဉ် ဝင်ငွေ / ထွက်ငွေ မှတ်တမ်း</p>
-  <div class="user-info" id="headerUserInfo" onclick="logoutUser()">👤 <span id="displayUserName"></span></div>
+  <p>နေ့စဉ် ဝင်ငွေ / အသုံးစရိတ် မှတ်တမ်း</p>
+  <div class="user-info" id="headerUserInfo" onclick="event.stopPropagation(); logoutUser()">👤 <span id="displayUserName">User</span></div>
 </div>
 
 <div class="container">
   <div class="tabs">
     <button class="active" onclick="switchTab('main', this)">🏠 ပင်မ</button>
-    <button onclick="switchTab('reports', this)">📊 ဇယား</button>
+    <button onclick="switchTab('reports', this)">📊 လစဉ်ဇယား</button>
     <button id="adminTabBtn" style="display:none;" onclick="switchTab('admin', this)">🔧 Admin</button>
   </div>
 
   <!-- MAIN TAB -->
   <div id="tab-main" class="tab-content active">
     <div class="contact-box">
-      📢 ကြော်ငြာ ထည့်သွင်းလိုပါက Video ပေးပို့ပြီး အောက်ပါ Email ကို ဆက်သွယ်ပါ<br>
+      📢 ကြော်ငြာ ထည့်သွင်းလိုပါက Video ပေးပို့ပြီး အောက်ပါ Email သို့ ဆက်သွယ်ပါ<br>
       <span class="email-text">sithu233396@gmail.com</span>
     </div>
 
+    <!-- ယနေ့ စာရင်း -->
     <div class="summary-grid">
       <div class="summary-card">
         <div class="label">ယနေ့ ဝင်ငွေ</div>
         <div class="value income-color" id="todayIncome">0</div>
       </div>
       <div class="summary-card">
-        <div class="label">ယနေ့ ထွက်ငွေ</div>
+        <div class="label">ယနေ့ အသုံးစရိတ်</div>
         <div class="value expense-color" id="todayExpense">0</div>
       </div>
       <div class="summary-card">
@@ -277,42 +289,47 @@
       </div>
     </div>
 
-    <div class="month-box">
-      <h3>📅 ယခုလ စာရင်း (<span id="monthName"></span>)</h3>
-      <div class="month-row"><span>စုစုပေါင်း ဝင်ငွေ</span><span class="income-color" id="monthIncome">0</span></div>
-      <div class="month-row"><span>စုစုပေါင်း ထွက်ငွေ</span><span class="expense-color" id="monthExpense">0</span></div>
-      <div class="month-row"><span><strong>လက်ကျန်</strong></span><span class="balance-color" id="monthBalance"><strong>0</strong></span></div>
-    </div>
-
+    <!-- မှတ်တမ်းအသစ် ထည့်ရန် (အပေါ်ရွှေ့ထားသည်) -->
     <div class="form-box">
       <h3>➕ မှတ်တမ်းအသစ် ထည့်ရန်</h3>
+      
       <div class="type-toggle">
-        <button id="btnIncome" class="active-income" onclick="setType('income')">ဝင်ငွေ</button>
-        <button id="btnExpense" onclick="setType('expense')">ထွက်ငွေ</button>
+        <button id="btnIncome" class="active-income" onclick="setType('income')">🟢 ဝင်ငွေ</button>
+        <button id="btnExpense" onclick="setType('expense')">🔴 အသုံးစရိတ်</button>
       </div>
+
+      <div class="form-group">
+        <label>ပမာဏ (ကျပ်)</label>
+        <input type="number" id="amount" class="amount-input" placeholder="0" min="0">
+      </div>
+
       <div class="form-group">
         <label>အမျိုးအစား</label>
         <select id="category"></select>
       </div>
-      <div class="form-group">
-        <label>ပမာဏ (ကျပ်)</label>
-        <input type="number" id="amount" placeholder="ဥပမာ 5000" min="0">
-      </div>
+
       <div class="form-group">
         <label>ရက်စွဲ</label>
         <input type="date" id="date">
       </div>
-      <div class="form-group">
-        <label>ဝင်ငွေ ရင်းမြစ် / အတိအကျ မှတ်သားချက်</label>
-        <input type="text" id="source" placeholder="ဥပမာ ABC ကုမ္ပဏီ / မောင်မောင်ဆိုင်">
-      </div>
+
       <div class="form-group">
         <label>မှတ်စု (မဖြစ်မနေ မဟုတ်)</label>
-        <textarea id="note" placeholder="ဥပမာ နေ့လယ်စာ"></textarea>
+        <input type="text" id="note" placeholder="ဥပမာ - နေ့လယ်စာ">
       </div>
-      <button class="save-btn" onclick="saveRecord()">သိမ်းဆည်းမည်</button>
+
+      <button class="save-btn" onclick="saveRecord()">✅ သိမ်းဆည်းမည်</button>
     </div>
 
+    <!-- ယခုလ စာရင်း -->
+    <div class="month-box">
+      <h3>📅 ယခုလ စာရင်း (<span id="monthName"></span>)</h3>
+      <div class="month-row"><span>စုစုပေါင်း ဝင်ငွေ</span><span class="income-color" id="monthIncome">0</span></div>
+      <div class="month-row"><span>စုစုပေါင်း အသုံးစရိတ်</span><span class="expense-color" id="monthExpense">0</span></div>
+      <div class="month-row"><span><strong>လက်ကျန်ငွေ</strong></span><span class="balance-color" id="monthBalance"><strong>0</strong></span></div>
+    </div>
+
+    <!-- မှတ်တမ်းစာရင်း -->
     <div class="list-box">
       <h3>📋 မှတ်တမ်းစာရင်း</h3>
       <div id="recordList"></div>
@@ -322,7 +339,7 @@
   <!-- REPORTS TAB -->
   <div id="tab-reports" class="tab-content">
     <div class="report-box">
-      <h3>📊 လစဉ် ဝင်ငွေ/ထွက်ငွေ ဇယား</h3>
+      <h3>📊 လစဉ် ဝင်ငွေ/သုံးငွေ ဇယား</h3>
       <div class="report-controls">
         <select id="reportYear"></select>
         <select id="reportMonth"></select>
@@ -330,661 +347,533 @@
       </div>
       <div id="monthlyReportResult"></div>
     </div>
-
-    <div class="report-box">
-      <h3>📅 တစ်နှစ်စာ လစဉ် အနှစ်ချုပ် ဇယား</h3>
-      <div class="report-controls">
-        <select id="annualYear"></select>
-        <button onclick="renderAnnualReport()">ကြည့်မည်</button>
-      </div>
-      <div id="annualReportResult"></div>
-    </div>
   </div>
 
   <!-- ADMIN TAB -->
   <div id="tab-admin" class="tab-content">
     <div class="admin-box">
-      <h3>🔧 Admin Panel - ကြော်ငြာ Video စီမံခန့်ခွဲမှု</h3>
+      <h3>🔧 Admin Panel</h3>
       
+      <div style="background:#eef2ff; border:1px solid #c7d2fe; padding:12px; border-radius:8px; margin-bottom:16px;">
+        <h4 style="font-size:14px; color:#1e3a8a; margin-bottom:6px;">☁️ ကြော်ငြာ Video တင်ရန်</h4>
+        <p style="font-size:12px; color:#4b5563; margin-bottom:10px; line-height:1.4;">
+          Video ဖိုင် အရွယ်အစား ကန့်သတ်ချက် မရှိပါ။ တင်လိုက်တာနဲ့ အားလုံးမြင်နိုင်မည့် ကြော်ငြာနေရာတွင် ချက်ချင်း Update ဖြစ်သွားပါမည်။
+        </p>
+      </div>
+
       <div class="form-group">
-        <label>Video ဖိုင် ရွေးချယ်ပါ (MP4, WebM - ဆိုဒ်ကန့်သတ်မရှိ)</label>
-        <input type="file" id="adVideoFile" accept="video/mp4,video/webm,video/ogg" onchange="handleAdVideoUpload(event)">
+        <label>Video ဖိုင် ရွေးချယ်ပါ</label>
+        <input type="file" id="adVideoFile" accept="video/mp4,video/webm,video/quicktime" onchange="handleAdVideoUpload(event)">
       </div>
       
       <div class="form-group">
-        <label>ကြော်ငြာ အမည် (Video ပေါ်တွင် ပြသမည်)</label>
+        <label>ကြော်ငြာ ခေါင်းစဉ် (စာသား)</label>
         <input type="text" id="adVideoTitle" placeholder="ဥပမာ - ABC ကုမ္ပဏီ">
       </div>
 
       <div class="form-group">
-        <label>ဖော်ပြချက် / လိပ်စာ / Link (Video ပေါ်တွင် ပြသမည်)</label>
-        <input type="text" id="adVideoDesc" placeholder="ဥပမာ - ပစ္စည်းများဝယ်ယူရန် https://... သို့မဟုတ် ဆက်သွယ်ရန် 09xxxxxxx">
+        <label>ဖော်ပြချက် / လိပ်စာ (စာသား)</label>
+        <input type="text" id="adVideoDesc" placeholder="ဥပမာ - ပစ္စည်းများဝယ်ယူရန်">
       </div>
 
       <div class="video-preview" id="adVideoPreview" style="display:none;">
         <video id="previewVideo" controls></video>
       </div>
 
-      <button class="save-btn" onclick="saveAdVideo()" style="margin-top:10px;">📤 ကြော်ငြာ Video တင်မည်</button>
-
-      <h3 style="margin-top:16px;">📹 တင်ထားသော ကြော်ငြာ Video များ</h3>
+      <button class="save-btn" id="uploadVideoBtn" onclick="saveAdVideo()" style="background:#1a8917; margin-top:12px;">📤 Video တင်မည်</button>
+      
+      <h3 style="margin-top:20px;">📹 တင်ထားသော ကြော်ငြာများ</h3>
       <div id="adVideoList"></div>
 
-      <button class="save-btn" onclick="clearAllAds()" style="background:#d93025; margin-top:12px;">🗑️ အားလုံး ဖျက်မည်</button>
-      <button class="save-btn" onclick="logoutAdmin()" style="background:#65676b; margin-top:8px;">🚪 Logout Admin</button>
+      <button class="save-btn" onclick="logoutAdmin()" style="background:#65676b; margin-top:16px;">🚪 Logout Admin</button>
     </div>
   </div>
 </div>
 
-<!-- AD CONTAINER (5 clicks to open admin) -->
+<!-- ကြော်ငြာနေရာ -->
 <div class="ad-container" id="adContainer">
   <div class="ad-video-wrapper" id="adVideoWrapper">
     <video id="adVideoPlayer" controls autoplay muted loop playsinline style="display:none;"></video>
-    
-    <!-- Video အပေါ်မှာ လှပစွာ ပေါ်နေမယ့် စာသား (Overlay) -->
     <div class="ad-overlay-info" id="adOverlayInfo" style="display:none;">
       <div class="title" id="overlayTitle"></div>
       <div class="desc" id="overlayDesc"></div>
     </div>
   </div>
-  
-  <!-- Video မရှိချိန် ပြသမည့် နေရာ (Admin Panel ဖွင့်ရန် ၅ ချက်နှိပ်ရမည်) -->
-  <div class="ad-placeholder" id="adPlaceholder" onclick="handleAdClick()">
-    📢 ကြော်ငြာနေရာ (Ad Space)<br>
+  <div class="ad-placeholder" id="adPlaceholder">
+    📢 ကြော်ငြာနေရာ<br>
     <span style="font-size:10px;">ကြော်ငြာ ထည့်လိုပါက sithu233396@gmail.com သို့ ဆက်သွယ်ပါ</span>
   </div>
 </div>
 
+<!-- Supabase SDK -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
 <script>
-/* ========== Constants ========== */
+/* =========================================================
+   ✅ Supabase Configuration
+   ========================================================= */
+const SUPABASE_URL = "https://bvgmxoznqwobuttzkqnh.supabase.co"; 
+const SUPABASE_ANON_KEY = "sb_publishable_KltG44G9jPPSd0VOvSL8aA_lujm73lz";
+
+const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+const BUCKET_NAME = 'ads';
+
+/* ========== အခြေခံ ကိန်းသေများ ========== */
 const STORAGE_KEY = 'money_tracker_records_v2';
 const USERS_DB_KEY = 'money_tracker_users_db';
 const CURRENT_USER_KEY = 'money_tracker_current_user';
 const ADMIN_SESSION_KEY = 'money_tracker_admin_session';
-const ADMIN_PASSWORD = 'sithu2024'; 
+const ADMIN_PASSWORD = 'sithu123'; 
 
 let records = [];
 let currentType = 'income';
 let clickCount = 0;
 let clickTimer = null;
+let adVideos = []; // ကြော်ငြာ Video များ သိမ်းရန် Array
+let adPlayIndex = 0; // အလှည့်ကျပြသရန် Index
 
-// IndexedDB Setup
-let db;
-const request = indexedDB.open("AdVideoDB", 1);
-request.onupgradeneeded = function(e) {
-  db = e.target.result;
-  if (!db.objectStoreNames.contains('videos')) {
-    db.createObjectStore('videos', { keyPath: 'id' });
-  }
-};
-request.onsuccess = function(e) {
-  db = e.target.result;
-  updateAdDisplay();
-};
+window.addEventListener('DOMContentLoaded', () => {
+  loadAdVideos();
+  checkUserLogin();
+});
 
-/* ========== Auth Logic (Sign Up & Login) ========== */
-function getUsersDB() {
-  return JSON.parse(localStorage.getItem(USERS_DB_KEY)) || {};
-}
-
-function toggleAuthMode(mode) {
-  document.getElementById('signupSection').style.display = (mode === 'signup') ? 'block' : 'none';
-  document.getElementById('loginSection').style.display = (mode === 'login') ? 'block' : 'none';
-}
-
-function checkUserLogin() {
-  const currentUser = JSON.parse(localStorage.getItem(CURRENT_USER_KEY));
-  if (currentUser && currentUser.name && currentUser.phone) {
-    document.getElementById('displayUserName').textContent = currentUser.name;
-    document.getElementById('authModal').classList.remove('show');
+/* ========== ကြော်ငြာ Video စီမံခန့်ခွဲမှု (အလှည့်ကျပြသခြင်း) ========== */
+async function loadAdVideos() {
+  try {
+    const { data, error } = await _supabase.storage.from(BUCKET_NAME).list();
+    if (error) throw error;
     
-    // Load specific user records
-    records = JSON.parse(localStorage.getItem(STORAGE_KEY + '_' + currentUser.phone)) || [];
+    adVideos = data.filter(file => file.name.startsWith('ad_'));
+    adVideos.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
     
-    // Refresh UI
-    initAppData();
-  } else {
-    document.getElementById('authModal').classList.add('show');
-    toggleAuthMode('signup'); // Default to Signup
-  }
-}
-
-function registerUser() {
-  const name = document.getElementById('signupName').value.trim();
-  const phone = document.getElementById('signupPhone').value.trim();
-
-  if (!name) { alert('သင့်နာမည်ကို ထည့်သွင်းပါ။'); return; }
-  if (!phone || (!phone.startsWith('09') && !phone.startsWith('၀၉'))) {
-    alert('မှန်ကန်သော မြန်မာဖုန်းနံပါတ် (ဥပမာ - 09xxxxxxxxx) ထည့်ပါ။'); return;
-  }
-
-  const usersDB = getUsersDB();
-  if (usersDB[phone]) {
-    alert('❌ ဤဖုန်းနံပါတ်ဖြင့် အကောင့်ဖွင့်ပြီးသား ဖြစ်နေပါသည်။ Login ဝင်ပါ။');
-    toggleAuthMode('login');
-    document.getElementById('loginPhone').value = phone;
-    return;
-  }
-
-  // Save user to DB
-  usersDB[phone] = { name: name, phone: phone };
-  localStorage.setItem(USERS_DB_KEY, JSON.stringify(usersDB));
-
-  // Auto login
-  localStorage.setItem(CURRENT_USER_KEY, JSON.stringify({ name, phone }));
-  document.getElementById('displayUserName').textContent = name;
-  document.getElementById('authModal').classList.remove('show');
-  
-  // Init fresh records
-  records = [];
-  localStorage.setItem(STORAGE_KEY + '_' + phone, JSON.stringify(records));
-  initAppData();
-  alert('✅ အကောင့်ဖွင့်ခြင်း အောင်မြင်ပါသည်။');
-}
-
-function loginUser() {
-  const phone = document.getElementById('loginPhone').value.trim();
-
-  if (!phone) { alert('ဖုန်းနံပါတ် ထည့်ပါ။'); return; }
-
-  const usersDB = getUsersDB();
-  if (!usersDB[phone]) {
-    alert('❌ ဤဖုန်းနံပါတ်ဖြင့် အကောင့်မရှိသေးပါ။ Sign Up အရင်လုပ်ပါ။');
-    toggleAuthMode('signup');
-    return;
-  }
-
-  // Login successful
-  const user = usersDB[phone];
-  localStorage.setItem(CURRENT_USER_KEY, JSON.stringify(user));
-  document.getElementById('displayUserName').textContent = user.name;
-  document.getElementById('authModal').classList.remove('show');
-
-  // Load specific user records
-  records = JSON.parse(localStorage.getItem(STORAGE_KEY + '_' + phone)) || [];
-  initAppData();
-}
-
-function logoutUser() {
-  if (confirm('အကောင့်မှ ထွက်မှာ သေချာပါသလား?')) {
-    localStorage.removeItem(CURRENT_USER_KEY);
-    records = [];
-    document.getElementById('authModal').classList.add('show');
-    toggleAuthMode('login');
-    renderAll(); // clear UI
-  }
-}
-
-/* ========== Admin Logic (5 Clicks) ========== */
-function handleAdClick() {
-  clickCount++;
-  clearTimeout(clickTimer);
-  
-  if (clickCount >= 5) {
-    clickCount = 0;
-    openAdminLogin();
-  } else {
-    clickTimer = setTimeout(() => { clickCount = 0; }, 2000);
-  }
-}
-
-function openAdminLogin() {
-  if (isAdminLoggedIn()) {
-    showAdminTab();
-    switchTab('admin', document.getElementById('adminTabBtn'));
-    return;
-  }
-  document.getElementById('adminPassword').value = '';
-  document.getElementById('adminLoginModal').classList.add('show');
-  setTimeout(() => document.getElementById('adminPassword').focus(), 100);
-}
-
-function closeAdminLogin() {
-  document.getElementById('adminLoginModal').classList.remove('show');
-}
-
-function loginAdmin() {
-  const pw = document.getElementById('adminPassword').value;
-  if (pw === ADMIN_PASSWORD) {
-    sessionStorage.setItem(ADMIN_SESSION_KEY, 'true');
-    closeAdminLogin();
-    showAdminTab();
-    switchTab('admin', document.getElementById('adminTabBtn'));
-    alert('✅ Admin အဖြစ် ဝင်ရောက်ပြီးပါပြီ။');
-  } else {
-    alert('❌ Password မှားနေပါသည်။');
-  }
-}
-
-function logoutAdmin() {
-  if (!confirm('Admin မှ ထွက်မှာ သေချာပါသလား?')) return;
-  sessionStorage.removeItem(ADMIN_SESSION_KEY);
-  hideAdminTab();
-  switchTab('main', document.querySelector('.tabs button'));
-}
-
-function isAdminLoggedIn() {
-  return sessionStorage.getItem(ADMIN_SESSION_KEY) === 'true';
-}
-
-function showAdminTab() {
-  document.getElementById('adminTabBtn').style.display = '';
-}
-
-function hideAdminTab() {
-  document.getElementById('adminTabBtn').style.display = 'none';
-  document.getElementById('tab-admin').classList.remove('active');
-}
-
-/* ========== IndexedDB Video Logic ========== */
-let pendingVideoFile = null;
-let pendingVideoDataURL = null;
-
-function handleAdVideoUpload(event) {
-  const file = event.target.files[0];
-  if (!file) return;
-
-  pendingVideoFile = file;
-  const reader = new FileReader();
-  reader.onload = function(e) {
-    pendingVideoDataURL = e.target.result;
-    document.getElementById('previewVideo').src = pendingVideoDataURL;
-    document.getElementById('adVideoPreview').style.display = 'block';
-  };
-  reader.readAsDataURL(file);
-}
-
-function saveAdVideo() {
-  if (!pendingVideoFile) {
-    alert('Video ဖိုင် ရွေးချယ်ပါ။');
-    return;
-  }
-
-  const title = document.getElementById('adVideoTitle').value.trim() || 'ကြော်ငြာ';
-  const desc = document.getElementById('adVideoDesc').value.trim() || '';
-  const videoBlob = new Blob([pendingVideoFile], { type: pendingVideoFile.type });
-  
-  const transaction = db.transaction(['videos'], 'readwrite');
-  const store = transaction.objectStore('videos');
-  
-  const adObject = {
-    id: Date.now(),
-    title: title,
-    desc: desc,
-    blob: videoBlob,
-    added: new Date().toISOString()
-  };
-
-  const req = store.add(adObject);
-  req.onsuccess = function() {
-    alert('✅ ကြော်ငြာ Video တင်ပြီးပါပြီ။');
-    pendingVideoFile = null;
-    pendingVideoDataURL = null;
-    document.getElementById('adVideoPreview').style.display = 'none';
-    document.getElementById('adVideoFile').value = '';
-    document.getElementById('adVideoTitle').value = '';
-    document.getElementById('adVideoDesc').value = '';
-    renderAdVideoList();
-    updateAdDisplay();
-  };
-  req.onerror = function(e) {
-    alert('❌ Error: ' + e.target.error);
-  };
-}
-
-function renderAdVideoList() {
-  const el = document.getElementById('adVideoList');
-  el.innerHTML = '<div class="empty-msg">ဖတ်နေသည်...</div>';
-
-  const transaction = db.transaction(['videos'], 'readonly');
-  const store = transaction.objectStore('videos');
-  const req = store.getAll();
-
-  req.onsuccess = function() {
-    const ads = req.result.sort((a, b) => b.id - a.id);
-    if (ads.length === 0) {
-      el.innerHTML = '<div class="empty-msg">ကြော်ငြာ Video မရှိသေးပါ။</div>';
-      return;
+    if (adVideos.length > 0) {
+      playNextAd();
+    } else {
+      updateAdDisplay();
     }
-    el.innerHTML = ads.map(a => `
-      <div class="video-item">
-        <div class="vid-info">
-          <div class="vid-name">🎬 ${a.title}</div>
-          <div class="vid-meta">${a.desc ? a.desc.substring(0, 30) + (a.desc.length > 30 ? '...' : '') : 'ဖော်ပြချက်မရှိ'}</div>
-          <div class="vid-meta" style="color:#a0a0a0;">${new Date(a.added).toLocaleString()} (${(a.blob.size/(1024*1024)).toFixed(1)} MB)</div>
-        </div>
-        <button class="delete-btn" onclick="deleteAdVideo(${a.id})">✕ ဖျက်</button>
-      </div>
-    `).join('');
-  };
-}
-
-function deleteAdVideo(id) {
-  if (!confirm('ဤကြော်ငြာ Video ကို ဖျက်မှာ သေချာပါသလား?')) return;
-  const transaction = db.transaction(['videos'], 'readwrite');
-  const store = transaction.objectStore('videos');
-  const req = store.delete(id);
-  req.onsuccess = function() {
-    renderAdVideoList();
+  } catch (e) {
+    console.log("Video များ မရှိသေးပါ", e);
     updateAdDisplay();
-  };
+  }
 }
 
-function clearAllAds() {
-  if (!confirm('ကြော်ငြာ Video အားလုံးကို ဖျက်မှာ သေချာပါသလား?')) return;
-  const transaction = db.transaction(['videos'], 'readwrite');
-  const store = transaction.objectStore('videos');
-  const req = store.clear();
-  req.onsuccess = function() {
-    renderAdVideoList();
-    updateAdDisplay();
-  };
-}
-
-function updateAdDisplay() {
+function playNextAd() {
   const player = document.getElementById('adVideoPlayer');
-  const wrapper = document.getElementById('adVideoWrapper');
   const placeholder = document.getElementById('adPlaceholder');
   const overlay = document.getElementById('adOverlayInfo');
   const titleEl = document.getElementById('overlayTitle');
   const descEl = document.getElementById('overlayDesc');
 
-  if (!db) return;
+  if (adVideos.length === 0) {
+    player.style.display = 'none';
+    placeholder.style.display = 'block';
+    overlay.style.display = 'none';
+    return;
+  }
 
-  const transaction = db.transaction(['videos'], 'readonly');
-  const store = transaction.objectStore('videos');
-  const req = store.getAll();
+  const currentAd = adVideos[adPlayIndex];
+  const { data } = _supabase.storage.from(BUCKET_NAME).getPublicUrl(currentAd.name);
+  const videoUrl = data.publicUrl;
 
-  req.onsuccess = function() {
-    const ads = req.result.sort((a, b) => b.id - a.id); 
-    if (ads.length > 0) {
-      const latestVideo = ads[0];
-      const url = URL.createObjectURL(latestVideo.blob);
-      
-      if (player.src && player.src.startsWith('blob:')) {
-        URL.revokeObjectURL(player.src);
-      }
+  // စာသားများ ပြင်ဆင်ခြင်း
+  titleEl.textContent = currentAd.name.split('_title_')[1] || 'ကြော်ငြာ';
+  descEl.textContent = currentAd.name.split('_desc_')[1] || '';
 
-      player.src = url;
-      player.style.display = 'block';
-      placeholder.style.display = 'none';
-      
-      titleEl.textContent = latestVideo.title || '';
-      descEl.textContent = latestVideo.desc || '';
-      
-      if (latestVideo.title || latestVideo.desc) {
-        overlay.style.display = 'block';
-      } else {
-        overlay.style.display = 'none';
-      }
+  player.src = videoUrl;
+  player.style.display = 'block';
+  placeholder.style.display = 'none';
+  overlay.style.display = 'block';
+  player.play().catch(e => console.log("Autoplay blocked", e));
 
-    } else {
-      player.style.display = 'none';
-      player.src = '';
-      placeholder.style.display = 'block';
-      overlay.style.display = 'none';
-    }
+  // အလှည့်ကျ ပြောင်းရန် Event ထည့်ခြင်း
+  player.onended = () => {
+    adPlayIndex = (adPlayIndex + 1) % adVideos.length;
+    playNextAd();
   };
 }
 
-/* ========== Core App Logic ========== */
+function updateAdDisplay() {
+  const player = document.getElementById('adVideoPlayer');
+  const placeholder = document.getElementById('adPlaceholder');
+  const overlay = document.getElementById('adOverlayInfo');
+
+  if (adVideos.length > 0) {
+    player.style.display = 'block';
+    placeholder.style.display = 'none';
+    overlay.style.display = 'block';
+  } else {
+    player.style.display = 'none';
+    player.src = '';
+    placeholder.style.display = 'block';
+    overlay.style.display = 'none';
+  }
+}
+
+let pendingVideoFile = null;
+function handleAdVideoUpload(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+  pendingVideoFile = file;
+  const url = URL.createObjectURL(file);
+  document.getElementById('previewVideo').src = url;
+  document.getElementById('adVideoPreview').style.display = 'block';
+}
+
+async function saveAdVideo() {
+  if (!pendingVideoFile) { alert('Video ဖိုင် ရွေးချယ်ပါ။'); return; }
+
+  const btn = document.getElementById('uploadVideoBtn');
+  btn.textContent = 'တင်နေသည်... ခဏစောင့်ပါ';
+  btn.disabled = true;
+
+  const title = document.getElementById('adVideoTitle').value.trim() || 'ကြော်ငြာ';
+  const desc = document.getElementById('adVideoDesc').value.trim() || '';
+  
+  // ဖိုင်နာမည်တွင် Title နှင့် Desc ကို ပေါင်းစပ်သိမ်းဆည်းမည်
+  const fileName = `ad_${Date.now()}_title_${title}_desc_${desc}.mp4`;
+
+  try {
+    const { data, error } = await _supabase.storage
+      .from(BUCKET_NAME)
+      .upload(fileName, pendingVideoFile, {
+        cacheControl: '3600',
+        upsert: false,
+        contentType: pendingVideoFile.type || 'video/mp4'
+      });
+
+    if (error) throw error;
+
+    alert('✅ ကြော်ငြာ Video ကို အောင်မြင်စွာ တင်ပြီးပါပြီ။');
+    
+    // Reset
+    pendingVideoFile = null;
+    document.getElementById('adVideoPreview').style.display = 'none';
+    document.getElementById('adVideoFile').value = '';
+    document.getElementById('adVideoTitle').value = '';
+    document.getElementById('adVideoDesc').value = '';
+
+    await loadAdVideos();
+    renderAdVideoList();
+
+  } catch (error) {
+    alert('❌ တင်မအောင်မြင်ပါ: ' + error.message);
+  } finally {
+    btn.textContent = '📤 Video တင်မည်';
+    btn.disabled = false;
+  }
+}
+
+async function renderAdVideoList() {
+  const el = document.getElementById('adVideoList');
+  el.innerHTML = '<div class="empty-msg">ဖတ်နေသည်...</div>';
+
+  try {
+    const { data, error } = await _supabase.storage.from(BUCKET_NAME).list();
+    if (error) throw error;
+    
+    const videos = data.filter(file => file.name.startsWith('ad_'));
+    videos.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+
+    if (videos.length === 0) {
+      el.innerHTML = '<div class="empty-msg">Video မရှိသေးပါ။</div>';
+      return;
+    }
+
+    el.innerHTML = videos.map(v => {
+      const title = v.name.split('_title_')[1] || 'ကြော်ငြာ';
+      const desc = v.name.split('_desc_')[1] || '';
+      return `
+      <div class="video-item">
+        <div class="vid-info">
+          <div class="vid-name">🎬 ${title}</div>
+          <div class="vid-meta">${desc ? desc.substring(0, 20) + '...' : 'ဖော်ပြချက်မရှိ'}</div>
+        </div>
+        <button class="delete-btn" onclick="deleteAdVideo('${v.name}')">ဖျက်</button>
+      </div>
+      `;
+    }).join('');
+  } catch (e) {
+    el.innerHTML = '<div class="empty-msg">ဖတ်၍မရပါ။</div>';
+  }
+}
+
+async function deleteAdVideo(fileName) {
+  if (!confirm('ဤ Video ကို ဖျက်မှာ သေချာပါသလား?')) return;
+  try {
+    const { error } = await _supabase.storage.from(BUCKET_NAME).remove([fileName]);
+    if (error) throw error;
+    alert('✅ ဖျက်ပြီးပါပြီ။');
+    await loadAdVideos();
+    renderAdVideoList();
+  } catch (e) {
+    alert('❌ ဖျက်၍မရပါ: ' + e.message);
+  }
+}
+
+/* ========== User Auth ========== */
+function getUsersDB() { return JSON.parse(localStorage.getItem(USERS_DB_KEY)) || {}; }
+function toggleAuthMode(mode) {
+  document.getElementById('signupSection').style.display = (mode === 'signup') ? 'block' : 'none';
+  document.getElementById('loginSection').style.display = (mode === 'login') ? 'block' : 'none';
+}
+function checkUserLogin() {
+  const currentUser = JSON.parse(localStorage.getItem(CURRENT_USER_KEY));
+  if (currentUser && currentUser.name && currentUser.phone) {
+    document.getElementById('displayUserName').textContent = currentUser.name;
+    document.getElementById('authModal').classList.remove('show');
+    records = JSON.parse(localStorage.getItem(STORAGE_KEY + '_' + currentUser.phone)) || [];
+    initAppData();
+  } else {
+    document.getElementById('authModal').classList.add('show');
+    toggleAuthMode('signup');
+  }
+}
+function registerUser() {
+  const name = document.getElementById('signupName').value.trim();
+  const phone = document.getElementById('signupPhone').value.trim();
+  if (!name) { alert('သင့်နာမည်ကို ထည့်သွင်းပါ။'); return; }
+  if (!phone || (!phone.startsWith('09') && !phone.startsWith('၀၉'))) {
+    alert('မှန်ကန်သော မြန်မာဖုန်းနံပါတ် ထည့်ပါ။'); return;
+  }
+  const usersDB = getUsersDB();
+  if (usersDB[phone]) {
+    alert('❌ ဤဖုန်းနံပါတ်ဖြင့် အကောင့်ဖွင့်ပြီးသား ဖြစ်ပါသည်။');
+    toggleAuthMode('login'); document.getElementById('loginPhone').value = phone; return;
+  }
+  usersDB[phone] = { name: name, phone: phone };
+  localStorage.setItem(USERS_DB_KEY, JSON.stringify(usersDB));
+  localStorage.setItem(CURRENT_USER_KEY, JSON.stringify({ name, phone }));
+  document.getElementById('displayUserName').textContent = name;
+  document.getElementById('authModal').classList.remove('show');
+  records = []; localStorage.setItem(STORAGE_KEY + '_' + phone, JSON.stringify(records));
+  initAppData(); alert('✅ အကောင့်ဖွင့်ခြင်း အောင်မြင်ပါသည်။');
+}
+function loginUser() {
+  const phone = document.getElementById('loginPhone').value.trim();
+  if (!phone) { alert('ဖုန်းနံပါတ် ထည့်ပါ။'); return; }
+  const usersDB = getUsersDB();
+  if (!usersDB[phone]) {
+    alert('❌ ဤဖုန်းနံပါတ်ဖြင့် အကောင့်မရှိပါ။ Sign Up အရင်လုပ်ပါ။');
+    toggleAuthMode('signup'); return;
+  }
+  localStorage.setItem(CURRENT_USER_KEY, JSON.stringify(usersDB[phone]));
+  document.getElementById('displayUserName').textContent = usersDB[phone].name;
+  document.getElementById('authModal').classList.remove('show');
+  records = JSON.parse(localStorage.getItem(STORAGE_KEY + '_' + phone)) || [];
+  initAppData();
+}
+function logoutUser() {
+  if (confirm('အကောင့်မှ ထွက်မှာ သေချာပါသလား?')) {
+    localStorage.removeItem(CURRENT_USER_KEY); records = [];
+    document.getElementById('authModal').classList.add('show');
+    toggleAuthMode('login'); renderAll();
+  }
+}
+
+/* ========== Admin Logic ========== */
+function handleAdminClick() {
+  clickCount++;
+  clearTimeout(clickTimer);
+  if (clickCount >= 5) { clickCount = 0; openAdminLogin(); } 
+  else { clickTimer = setTimeout(() => { clickCount = 0; }, 2000); }
+}
+function openAdminLogin() {
+  if (isAdminLoggedIn()) { 
+    showAdminTab(); 
+    switchTab('admin', document.getElementById('adminTabBtn')); 
+    alert('✅ Admin Panel ထဲသို့ ဝင်ရောက်ပြီးဖြစ်ပါသည်။');
+    return; 
+  }
+  document.getElementById('adminPassword').value = '';
+  document.getElementById('adminLoginModal').classList.add('show');
+  setTimeout(() => document.getElementById('adminPassword').focus(), 100);
+}
+function closeAdminLogin() { document.getElementById('adminLoginModal').classList.remove('show'); }
+function loginAdmin() {
+  if (document.getElementById('adminPassword').value === ADMIN_PASSWORD) {
+    sessionStorage.setItem(ADMIN_SESSION_KEY, 'true'); 
+    closeAdminLogin(); 
+    showAdminTab();
+    switchTab('admin', document.getElementById('adminTabBtn')); 
+    alert('✅ အောင်မြင်ပါသည်။ Admin အဖြစ် ဝင်ရောက်ပြီးပါပြီ။');
+    renderAdVideoList();
+  } else { 
+    alert('❌ Password မှားနေပါသည်။'); 
+  }
+}
+function logoutAdmin() {
+  if (!confirm('Admin မှ ထွက်မှာ သေချာပါသလား?')) return;
+  sessionStorage.removeItem(ADMIN_SESSION_KEY); 
+  hideAdminTab();
+  switchTab('main', document.querySelector('.tabs button'));
+}
+function isAdminLoggedIn() { return sessionStorage.getItem(ADMIN_SESSION_KEY) === 'true'; }
+function showAdminTab() { document.getElementById('adminTabBtn').style.display = ''; }
+function hideAdminTab() { 
+  document.getElementById('adminTabBtn').style.display = 'none'; 
+  document.getElementById('tab-admin').classList.remove('active'); 
+}
+
+/* ========== ငွေစာရင်း Logic ========== */
 const CATEGORIES = {
   income: ['လစာ', 'အပိုဝင်ငွေ', 'အလုပ်ခွန်', 'လက်ဆောင်', 'ရင်းနှီးမြှုပ်နှံမှု', 'အခြား'],
   expense: ['အစားအစာ', 'သယ်ယူပို့ဆောင်ရေး', 'အိမ်ငှား', 'မီတာ/ရေ', 'ဖုန်း/အင်တာနက်', 'ကျန်းမာရေး', 'ပညာရေး', 'အဝတ်အစား', 'အခြား']
 };
-
 function switchTab(name, btn) {
   document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
   document.querySelectorAll('.tabs button').forEach(b => b.classList.remove('active'));
   document.getElementById('tab-' + name).classList.add('active');
   if (btn) btn.classList.add('active');
-  if (name === 'reports') { populateReportSelectors(); renderMonthlyReport(); renderAnnualReport(); }
-  if (name === 'admin') { renderAdVideoList(); }
+  if (name === 'reports') { populateReportSelectors(); renderMonthlyReport(); }
 }
-
 function setType(type) {
   currentType = type;
   document.getElementById('btnIncome').className = type === 'income' ? 'active-income' : '';
   document.getElementById('btnExpense').className = type === 'expense' ? 'active-expense' : '';
   updateCategoryOptions();
 }
-
 function updateCategoryOptions() {
-  const sel = document.getElementById('category');
-  sel.innerHTML = '';
+  const sel = document.getElementById('category'); sel.innerHTML = '';
   CATEGORIES[currentType].forEach(cat => {
-    const opt = document.createElement('option');
-    opt.value = cat; opt.textContent = cat; sel.appendChild(opt);
+    const opt = document.createElement('option'); opt.value = cat; opt.textContent = cat; sel.appendChild(opt);
   });
 }
-
 function saveRecord() {
   const currentUser = JSON.parse(localStorage.getItem(CURRENT_USER_KEY));
   if (!currentUser) { alert('အရင်ဆုံး Login ဝင်ပါ။'); return; }
-
-  const category = document.getElementById('category').value;
   const amount = parseFloat(document.getElementById('amount').value);
+  const category = document.getElementById('category').value;
   const date = document.getElementById('date').value;
-  const source = document.getElementById('source').value.trim();
   const note = document.getElementById('note').value.trim();
-
   if (!amount || amount <= 0) { alert('ပမာဏ မှန်ကန်စွာ ထည့်ပါ။'); return; }
   if (!date) { alert('ရက်စွဲ ရွေးပါ။'); return; }
-  if (currentType === 'income' && !source) {
-    if (!confirm('ဝင်ငွေ ရင်းမြစ် အတိအကျ မဖြည့်ထားပါ။ ဆက်လုပ်မလား?')) return;
-  }
 
-  records.push({ id: Date.now(), type: currentType, category, amount, date, source: source || '-', note });
+  records.push({ id: Date.now(), type: currentType, category, amount, date, note });
   localStorage.setItem(STORAGE_KEY + '_' + currentUser.phone, JSON.stringify(records));
   
-  document.getElementById('amount').value = '';
-  document.getElementById('source').value = '';
+  document.getElementById('amount').value = ''; 
   document.getElementById('note').value = '';
+  document.getElementById('amount').focus();
   renderAll();
+  alert('✅ မှတ်တမ်းကို အောင်မြင်စွာ သိမ်းဆည်းပြီးပါပြီ။');
 }
-
 function deleteRecord(id) {
   const currentUser = JSON.parse(localStorage.getItem(CURRENT_USER_KEY));
   if (!currentUser) return;
-
   if (!confirm('ဤမှတ်တမ်းကို ဖျက်မှာ သေချာပါသလား?')) return;
   records = records.filter(r => r.id !== id);
   localStorage.setItem(STORAGE_KEY + '_' + currentUser.phone, JSON.stringify(records));
   renderAll();
 }
-
 function formatMoney(n) { return n.toLocaleString('en-US') + ' ကျပ်'; }
 const MONTH_NAMES = ['ဇန်နဝါရီ','ဖေဖော်ဝါရီ','မတ်','ဧပြီ','မေ','ဇွန်','ဇူလိုင်','ဩဂုတ်','စက်တင်ဘာ','အောက်တိုဘာ','နိုဝင်ဘာ','ဒီဇင်ဘာ'];
 
 function renderAll() {
-  const today = new Date();
-  const todayStr = today.toISOString().split('T')[0];
+  const today = new Date(); 
+  const todayStr = today.toISOString().split('T')[0]; 
   const currentMonth = todayStr.substring(0, 7);
-
+  
   let todayIncome = 0, todayExpense = 0;
-  records.forEach(r => {
-    if (r.date === todayStr) {
-      if (r.type === 'income') todayIncome += r.amount;
-      else todayExpense += r.amount;
-    }
-  });
+  records.forEach(r => { if (r.date === todayStr) { if (r.type === 'income') todayIncome += r.amount; else todayExpense += r.amount; } });
   document.getElementById('todayIncome').textContent = formatMoney(todayIncome);
   document.getElementById('todayExpense').textContent = formatMoney(todayExpense);
   document.getElementById('todayBalance').textContent = formatMoney(todayIncome - todayExpense);
-
+  
   let monthIncome = 0, monthExpense = 0;
-  records.forEach(r => {
-    if (r.date.startsWith(currentMonth)) {
-      if (r.type === 'income') monthIncome += r.amount;
-      else monthExpense += r.amount;
-    }
-  });
+  records.forEach(r => { if (r.date.startsWith(currentMonth)) { if (r.type === 'income') monthIncome += r.amount; else monthExpense += r.amount; } });
   document.getElementById('monthIncome').textContent = formatMoney(monthIncome);
   document.getElementById('monthExpense').textContent = formatMoney(monthExpense);
   document.getElementById('monthBalance').innerHTML = '<strong>' + formatMoney(monthIncome - monthExpense) + '</strong>';
   document.getElementById('monthName').textContent = MONTH_NAMES[today.getMonth()] + ' ' + today.getFullYear();
-
+  
   const listEl = document.getElementById('recordList');
-  if (records.length === 0) {
-    listEl.innerHTML = '<div class="empty-msg">မှတ်တမ်း မရှိသေးပါ။</div>';
-    return;
+  if (records.length === 0) { 
+    listEl.innerHTML = '<div class="empty-msg">မှတ်တမ်း မရှိသေးပါ။</div>'; 
+    return; 
   }
-  const sorted = [...records].sort((a, b) => {
-    if (a.date !== b.date) return b.date.localeCompare(a.date);
-    return b.id - a.id;
+  const sorted = [...records].sort((a, b) => { 
+    if (a.date !== b.date) return b.date.localeCompare(a.date); 
+    return b.id - a.id; 
   });
-
   listEl.innerHTML = sorted.map(r => `
     <div class="record-item">
       <div class="record-left">
         <div class="cat">${r.type === 'income' ? '🟢' : '🔴'} ${r.category}</div>
-        <div class="meta">${r.date}${r.source && r.source !== '-' ? ' • 📌 ' + r.source : ''}${r.note ? ' • ' + r.note : ''}</div>
+        <div class="meta">${r.date}${r.note ? ' • ' + r.note : ''}</div>
       </div>
       <div class="record-right">
         <span class="amt ${r.type === 'income' ? 'income-color' : 'expense-color'}">
           ${r.type === 'income' ? '+' : '-'}${formatMoney(r.amount)}
         </span>
-        <button class="delete-btn" onclick="deleteRecord(${r.id})">✕</button>
+        <button class="delete-btn" onclick="deleteRecord(${r.id})">ဖျက်</button>
       </div>
     </div>
   `).join('');
 }
 
+/* ========== Reports ========== */
 function populateReportSelectors() {
-  const now = new Date();
-  const years = new Set();
+  const now = new Date(); const years = new Set();
   records.forEach(r => { const y = parseInt(r.date.substring(0, 4)); if (!isNaN(y)) years.add(y); });
-  years.add(now.getFullYear());
-  const yearArr = [...years].sort((a, b) => b - a);
-
-  const ySel = document.getElementById('reportYear');
-  const aSel = document.getElementById('annualYear');
+  years.add(now.getFullYear()); const yearArr = [...years].sort((a, b) => b - a);
+  
+  const ySel = document.getElementById('reportYear'); 
   const mSel = document.getElementById('reportMonth');
-
-  const curY = ySel.value, curM = mSel.value, curA = aSel.value;
-
+  const curY = ySel.value, curM = mSel.value;
+  
   ySel.innerHTML = yearArr.map(y => `<option value="${y}">${y}</option>`).join('');
-  aSel.innerHTML = yearArr.map(y => `<option value="${y}">${y}</option>`).join('');
   mSel.innerHTML = MONTH_NAMES.map((m, i) => `<option value="${String(i+1).padStart(2,'0')}">${m}</option>`).join('');
-
+  
   if (curY) ySel.value = curY; else ySel.value = now.getFullYear();
-  if (curA) aSel.value = curA; else aSel.value = now.getFullYear();
   if (curM) mSel.value = curM; else mSel.value = String(now.getMonth()+1).padStart(2,'0');
 }
-
 function renderMonthlyReport() {
-  const y = document.getElementById('reportYear').value;
-  const m = document.getElementById('reportMonth').value;
+  const y = document.getElementById('reportYear').value; 
+  const m = document.getElementById('reportMonth').value; 
   const prefix = y + '-' + m;
-
   const filtered = records.filter(r => r.date.startsWith(prefix));
-  const incomes = filtered.filter(r => r.type === 'income');
+  
+  const incomes = filtered.filter(r => r.type === 'income'); 
   const expenses = filtered.filter(r => r.type === 'expense');
-  const totalInc = incomes.reduce((s, r) => s + r.amount, 0);
+  const totalInc = incomes.reduce((s, r) => s + r.amount, 0); 
   const totalExp = expenses.reduce((s, r) => s + r.amount, 0);
-
+  
   const el = document.getElementById('monthlyReportResult');
-  if (filtered.length === 0) {
-    el.innerHTML = '<div class="empty-msg">ဤလအတွက် မှတ်တမ်း မရှိပါ။</div>';
-    return;
-  }
-
-  const incByCat = {}, expByCat = {};
-  incomes.forEach(r => { incByCat[r.category] = (incByCat[r.category] || 0) + r.amount; });
-  expenses.forEach(r => { expByCat[r.category] = (expByCat[r.category] || 0) + r.amount; });
-
-  let html = `<div style="margin:8px 0; font-size:13px;">
-    <strong>${MONTH_NAMES[parseInt(m)-1]} ${y}</strong> — 
-    ဝင်ငွေ: <span class="income-color">${formatMoney(totalInc)}</span> | 
-    ထွက်ငွေ: <span class="expense-color">${formatMoney(totalExp)}</span> | 
-    လက်ကျန်: <span class="balance-color"><strong>${formatMoney(totalInc - totalExp)}</strong></span>
+  if (filtered.length === 0) { el.innerHTML = '<div class="empty-msg">ဤလအတွက် မှတ်တမ်း မရှိပါ။</div>'; return; }
+  
+  let html = `<div class="table-summary">
+    <strong>${MONTH_NAMES[parseInt(m)-1]} ${y} လစဉ် အနှစ်ချုပ်</strong><br>
+    စုစုပေါင်း ဝင်ငွေ: <span class="income-color">${formatMoney(totalInc)}</span><br>
+    စုစုပေါင်း အသုံးစရိတ်: <span class="expense-color">${formatMoney(totalExp)}</span><br>
+    လက်ကျန်ငွေ: <span class="balance-color"><strong>${formatMoney(totalInc - totalExp)}</strong></span>
   </div>`;
 
-  html += '<table class="report-table"><tr><th>အမျိုးအစား</th><th>ဝင်ငွေ</th><th>ထွက်ငွေ</th></tr>';
-  const allCats = new Set([...Object.keys(incByCat), ...Object.keys(expByCat)]);
-  allCats.forEach(c => {
-    html += `<tr><td>${c}</td>
-      <td class="amount income-color">${incByCat[c] ? formatMoney(incByCat[c]) : '-'}</td>
-      <td class="amount expense-color">${expByCat[c] ? formatMoney(expByCat[c]) : '-'}</td></tr>`;
-  });
-  html += '</table>';
-
-  if (incomes.length > 0) {
-    const srcMap = {};
-    incomes.forEach(r => { const s = r.source || '-'; srcMap[s] = (srcMap[s] || 0) + r.amount; });
-    html += '<div style="margin-top:10px; font-size:12px;"><strong>ဝင်ငွေ ရင်းမြစ်များ:</strong><table class="report-table"><tr><th>ရင်းမြစ်</th><th>ပမာဏ</th></tr>';
-    Object.keys(srcMap).forEach(s => {
-      html += `<tr><td>📌 ${s}</td><td class="amount income-color">${formatMoney(srcMap[s])}</td></tr>`;
-    });
-    html += '</table></div>';
-  }
-
-  el.innerHTML = html;
-}
-
-function renderAnnualReport() {
-  const y = parseInt(document.getElementById('annualYear').value);
-  const el = document.getElementById('annualReportResult');
-
-  let rows = [];
-  let yearInc = 0, yearExp = 0;
-  for (let m = 1; m <= 12; m++) {
-    const prefix = y + '-' + String(m).padStart(2, '0');
-    const filtered = records.filter(r => r.date.startsWith(prefix));
-    if (filtered.length === 0) continue;
-    const inc = filtered.filter(r => r.type === 'income').reduce((s, r) => s + r.amount, 0);
-    const exp = filtered.filter(r => r.type === 'expense').reduce((s, r) => s + r.amount, 0);
-    yearInc += inc; yearExp += exp;
-    rows.push({ month: MONTH_NAMES[m-1], inc, exp, bal: inc - exp });
-  }
-
-  if (rows.length === 0) {
-    el.innerHTML = '<div class="empty-msg">ဤနှစ်အတွက် မှတ်တမ်း မရှိပါ။</div>';
-    return;
-  }
-
-  let html = `<div style="margin:8px 0; font-size:13px;">
-    <strong>${y} ခုနှစ် အနှစ်ချုပ်</strong> — 
-    ဝင်ငွေ: <span class="income-color">${formatMoney(yearInc)}</span> | 
-    ထွက်ငွေ: <span class="expense-color">${formatMoney(yearExp)}</span> | 
-    လက်ကျန်: <span class="balance-color"><strong>${formatMoney(yearInc - yearExp)}</strong></span>
-  </div>`;
-
-  html += '<table class="report-table"><tr><th>လ</th><th>ဝင်ငွေ</th><th>ထွက်ငွေ</th><th>လက်ကျန်</th></tr>';
-  rows.forEach(r => {
-    html += `<tr><td>${r.month}</td>
-      <td class="amount income-color">${formatMoney(r.inc)}</td>
-      <td class="amount expense-color">${formatMoney(r.exp)}</td>
-      <td class="amount balance-color">${formatMoney(r.bal)}</td></tr>`;
+  const sorted = [...filtered].sort((a, b) => a.date.localeCompare(b.date));
+  html += '<table class="report-table"><tr><th>ရက်စွဲ</th><th>အမျိုးအစား</th><th>ဝင်ငွေ</th><th>အသုံးစရိတ်</th></tr>';
+  sorted.forEach(r => {
+    html += `<tr>
+      <td>${r.date.substring(8,10)}</td>
+      <td>${r.category}${r.note ? ' <span style="font-size:10px;color:#888;">('+r.note+')</span>' : ''}</td>
+      <td class="amount income-color">${r.type === 'income' ? formatMoney(r.amount) : '-'}</td>
+      <td class="amount expense-color">${r.type === 'expense' ? formatMoney(r.amount) : '-'}</td>
+    </tr>`;
   });
   html += '</table>';
   el.innerHTML = html;
 }
 
-/* ========== Init App ========== */
+/* ========== Init ========== */
 function initAppData() {
   document.getElementById('date').value = new Date().toISOString().split('T')[0];
-  updateCategoryOptions();
-  renderAll();
+  updateCategoryOptions(); 
+  renderAll(); 
   populateReportSelectors();
-
-  if (isAdminLoggedIn()) {
-    showAdminTab();
-  } else {
-    hideAdminTab();
-  }
+  if (isAdminLoggedIn()) { showAdminTab(); } else { hideAdminTab(); }
 }
 
-function init() {
-  checkUserLogin();
-  updateAdDisplay();
-}
-
-document.getElementById('adminLoginModal').addEventListener('click', function(e) {
-  if (e.target === this) closeAdminLogin();
+document.getElementById('adminLoginModal').addEventListener('click', function(e) { 
+  if (e.target === this) closeAdminLogin(); 
 });
-
-init();
 </script>
 
 </body>
