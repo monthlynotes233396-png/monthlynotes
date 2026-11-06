@@ -88,11 +88,18 @@
   .report-controls { display: flex; gap: 8px; margin-bottom: 12px; flex-wrap: wrap; }
   .report-controls select, .report-controls button { padding: 8px 12px; border-radius: 8px; border: 1.5px solid #ccd0d5; font-size: 13px; font-family: inherit; background: #fff; cursor: pointer; font-weight: bold; }
   .report-controls button { background: #4b6cb7; color: #fff; border: none; }
-  .report-table { width: 100%; border-collapse: collapse; font-size: 12px; margin-top: 8px; }
-  .report-table th, .report-table td { padding: 8px 6px; border-bottom: 1px solid #eee; text-align: left; }
-  .report-table th { background: #f8f9fa; font-weight: bold; color: #182848; }
-  .report-table td.amount { text-align: right; font-weight: bold; }
-  .table-summary { background: #f0f4ff; padding: 10px; border-radius: 8px; margin-bottom: 10px; font-size: 13px; line-height: 1.5; }
+
+  /* ⭐️ ပုံစံအသစ် ငွေစာရင်းဇယား ⭐️ */
+  .finance-table { width: 100%; border-collapse: collapse; font-size: 12px; margin-top: 10px; background: #fff; }
+  .finance-table th, .finance-table td { border: 1px solid #b0b0b0; padding: 8px 6px; text-align: left; }
+  .finance-table th { background: #2b4b7c; color: #fff; text-align: center; font-weight: bold; }
+  .finance-table .section-header { font-weight: bold; text-align: center; }
+  .finance-table .income-header { background: #d9ead3; color: #1a8917; }
+  .finance-table .expense-header { background: #f4cccc; color: #d93025; }
+  .finance-table .summary-header { background: #cfe2f3; color: #1a73e8; }
+  .finance-table .total-row { font-weight: bold; background: #f8f9fa; }
+  .finance-table .text-right { text-align: right; }
+  .finance-table .text-center { text-align: center; }
 
   .admin-box { border: 2px solid #4b6cb7; }
   .admin-box input { margin-bottom: 10px; }
@@ -109,7 +116,6 @@
     z-index: 1000; display: flex; flex-direction: column; width: 100%;
   }
   
-  /* စာတန်းထိုး (Marquee) */
   .ticker-wrap {
     width: 100%; overflow: hidden; background: #f8f9fa; border-bottom: 1px solid #ddd;
     padding: 6px 0; white-space: nowrap; box-sizing: content-box; display: flex; align-items: center;
@@ -124,9 +130,9 @@
   }
   .ad-video-wrapper video { width: 100%; height: 100%; object-fit: contain; }
   
-  /* ⭐️ အကွက်ကျယ် ခလုတ်ကို အပေါ်ညာထောင့်သို့ ရွှေ့ထားသည် (Native Control တွေနဲ့ မထပ်စေရန်) ⭐️ */
+  /* ⭐️ အကွက်ကျယ် ခလုတ်ကို ဘယ်ဘက်သို့ ရွှေ့ထားသည် ⭐️ */
   .fullscreen-btn {
-    position: absolute; top: 8px; right: 8px; background: rgba(0,0,0,0.7);
+    position: absolute; top: 8px; left: 8px; background: rgba(0,0,0,0.7);
     color: #fff; border: 1px solid rgba(255,255,255,0.5); border-radius: 8px;
     padding: 6px 10px; font-size: 14px; cursor: pointer; 
     display: flex; align-items: center; gap: 4px; z-index: 9999;
@@ -155,12 +161,12 @@
 </head>
 <body>
 
-<!-- Custom Alert Modal -->
+<!-- Custom Alert Modal (ပိတ်ရန်ခလုတ်ပါဝင်သည်) -->
 <div class="modal-overlay" id="customAlertModal">
   <div class="modal-box">
     <h3 id="alertTitle">အသိပေးချက်</h3>
     <p id="alertMessage"></p>
-    <div class="btn-row"><button class="btn-primary" onclick="closeCustomAlert()">အဆင်ပြေသည်</button></div>
+    <div class="btn-row"><button class="btn-primary" onclick="closeCustomAlert()">ပိတ်မည် (OK)</button></div>
   </div>
 </div>
 
@@ -172,14 +178,20 @@
       <p>ဖုန်းနံပါတ်တစ်ခုလျှင် အကောင့်တစ်ခုသာ ဖွင့်နိုင်ပါမည်။</p>
       <input type="text" id="signupName" placeholder="သင့်နာမည်">
       <input type="tel" id="signupPhone" placeholder="ဖုန်းနံပါတ် (09xxxxxxxxx)">
-      <div class="btn-row"><button class="btn-primary" onclick="registerUser()">✅ အကောင့်ဖွင့်မည်</button></div>
+      <div class="btn-row">
+        <button class="btn-cancel" onclick="closeAuthModal()">ပိတ်မည်</button>
+        <button class="btn-primary" onclick="registerUser()">✅ အကောင့်ဖွင့်မည်</button>
+      </div>
       <p class="switch-text" onclick="toggleAuthMode('login')">အကောင့်ရှိပြီးသားလား? ဝင်ရန် နှိပ်ပါ</p>
     </div>
     <div id="loginSection" style="display:none;">
       <h3>👋 ပြန်လည်ကြိုဆိုပါတယ်</h3>
       <p>သင့်ဖုန်းနံပါတ်ဖြင့် ဝင်ရောက်ပါ</p>
       <input type="tel" id="loginPhone" placeholder="ဖုန်းနံပါတ် (09xxxxxxxxx)">
-      <div class="btn-row"><button class="btn-primary" onclick="loginUser()">✅ ဝင်မည်</button></div>
+      <div class="btn-row">
+        <button class="btn-cancel" onclick="closeAuthModal()">ပိတ်မည်</button>
+        <button class="btn-primary" onclick="loginUser()">✅ ဝင်မည်</button>
+      </div>
       <p class="switch-text" onclick="toggleAuthMode('signup')">အကောင့်မရှိသေးဘူးလား? အသစ်ဖွင့်ရန် နှိပ်ပါ</p>
     </div>
   </div>
@@ -274,16 +286,19 @@
     <button class="logout-main-btn" onclick="logoutUser()">🚪 အကောင့်မှ ထွက်မည် (Logout)</button>
   </div>
 
-  <!-- REPORTS TAB -->
+  <!-- ⭐️ REPORTS TAB (ပုံစံအသစ်) ⭐️ -->
   <div id="tab-reports" class="tab-content">
     <div class="report-box">
-      <h3>📊 လစဉ် ဝင်ငွေ/သုံးငွေ ဇယား</h3>
-      <div class="report-controls">
+      <h3 style="text-align: center; font-size: 16px; margin-bottom: 4px;">လစဉ် ဝင်ငွေနှင့် အသုံးစရိတ် တွက်ချက်မှုများ</h3>
+      <p style="text-align: center; font-size: 13px; color: #65676b; margin-bottom: 12px;" id="reportMonthYearText"></p>
+      
+      <div class="report-controls" style="justify-content: center; margin-bottom: 16px;">
         <select id="reportYear"></select>
         <select id="reportMonth"></select>
         <button onclick="renderMonthlyReport()">ကြည့်မည်</button>
       </div>
-      <div id="monthlyReportResult"></div>
+
+      <div id="monthlyReportResult" style="overflow-x: auto;"></div>
     </div>
   </div>
 
@@ -388,6 +403,9 @@ function showCustomAlert(title, message) {
 function closeCustomAlert() {
   document.getElementById('customAlertModal').classList.remove('show');
 }
+function closeAuthModal() {
+  document.getElementById('authModal').classList.remove('show');
+}
 
 /* ========== ကြော်ငြာ Video စီမံခန့်ခွဲမှု ========== */
 async function loadAdVideos() {
@@ -434,7 +452,6 @@ function playNextAd() {
   const { data } = _supabase.storage.from(BUCKET_NAME).getPublicUrl(currentAd.name);
   const videoUrl = data.publicUrl;
 
-  // ⭐️ Metadata ထဲကနေ စာသားတွေ ယူမယ် ⭐️
   let title = currentAd.metadata?.title || '';
   let desc = currentAd.metadata?.desc || '';
   
@@ -450,8 +467,6 @@ function playNextAd() {
   }
 
   tickerText.textContent = tickerString;
-  
-  // Animation အသစ်ပြန်စရန်
   tickerText.style.animation = 'none';
   tickerText.offsetHeight; 
   tickerText.style.animation = 'marquee 15s linear infinite'; 
@@ -527,7 +542,6 @@ async function saveAdVideo() {
   btn.textContent = 'တင်နေသည်... ခဏစောင့်ပါ';
   btn.disabled = true;
 
-  // ⭐️ ဖိုင်နာမည်ကို အင်္ဂလိပ်စာလုံးနဲ့ နံပါတ်ပဲ သုံးမယ် (Error မတက်စေရန်) ⭐️
   const fileName = `ad_${Date.now()}.mp4`;
 
   try {
@@ -537,7 +551,6 @@ async function saveAdVideo() {
         cacheControl: '3600',
         upsert: false,
         contentType: pendingVideoFile.type || 'video/mp4',
-        // စာသားတွေကို Metadata အနေနဲ့ သိမ်းမယ်
         metadata: { title: title, desc: desc }
       });
 
@@ -778,7 +791,9 @@ function deleteRecord(id) {
   localStorage.setItem(STORAGE_KEY + '_' + currentUser.phone, JSON.stringify(records));
   renderAll();
 }
-function formatMoney(n) { return n.toLocaleString('en-US') + ' ကျပ်'; }
+function formatMoney(n) { return n.toLocaleString('en-US'); } 
+function formatMoneyWithSymbol(n) { return n.toLocaleString('en-US') + ' ကျပ်'; }
+
 const MONTH_NAMES = ['ဇန်နဝါရီ','ဖေဖော်ဝါရီ','မတ်','ဧပြီ','မေ','ဇွန်','ဇူလိုင်','ဩဂုတ်','စက်တင်ဘာ','အောက်တိုဘာ','နိုဝင်ဘာ','ဒီဇင်ဘာ'];
 
 function renderAll() {
@@ -788,15 +803,15 @@ function renderAll() {
   
   let todayIncome = 0, todayExpense = 0;
   records.forEach(r => { if (r.date === todayStr) { if (r.type === 'income') todayIncome += r.amount; else todayExpense += r.amount; } });
-  document.getElementById('todayIncome').textContent = formatMoney(todayIncome);
-  document.getElementById('todayExpense').textContent = formatMoney(todayExpense);
-  document.getElementById('todayBalance').textContent = formatMoney(todayIncome - todayExpense);
+  document.getElementById('todayIncome').textContent = formatMoneyWithSymbol(todayIncome);
+  document.getElementById('todayExpense').textContent = formatMoneyWithSymbol(todayExpense);
+  document.getElementById('todayBalance').textContent = formatMoneyWithSymbol(todayIncome - todayExpense);
   
   let monthIncome = 0, monthExpense = 0;
   records.forEach(r => { if (r.date.startsWith(currentMonth)) { if (r.type === 'income') monthIncome += r.amount; else monthExpense += r.amount; } });
-  document.getElementById('monthIncome').textContent = formatMoney(monthIncome);
-  document.getElementById('monthExpense').textContent = formatMoney(monthExpense);
-  document.getElementById('monthBalance').innerHTML = '<strong>' + formatMoney(monthIncome - monthExpense) + '</strong>';
+  document.getElementById('monthIncome').textContent = formatMoneyWithSymbol(monthIncome);
+  document.getElementById('monthExpense').textContent = formatMoneyWithSymbol(monthExpense);
+  document.getElementById('monthBalance').innerHTML = '<strong>' + formatMoneyWithSymbol(monthIncome - monthExpense) + '</strong>';
   document.getElementById('monthName').textContent = MONTH_NAMES[today.getMonth()] + ' ' + today.getFullYear();
   
   const listEl = document.getElementById('recordList');
@@ -816,7 +831,7 @@ function renderAll() {
       </div>
       <div class="record-right">
         <span class="amt ${r.type === 'income' ? 'income-color' : 'expense-color'}">
-          ${r.type === 'income' ? '+' : '-'}${formatMoney(r.amount)}
+          ${r.type === 'income' ? '+' : '-'}${formatMoneyWithSymbol(r.amount)}
         </span>
         <button class="delete-btn" onclick="deleteRecord(${r.id})">ဖျက်</button>
       </div>
@@ -824,11 +839,21 @@ function renderAll() {
   `).join('');
 }
 
-/* ========== Reports ========== */
+/* ========== ⭐️ Reports (Image အတိုင်း ဇယားဆွဲခြင်း) ⭐️ ========== */
 function populateReportSelectors() {
-  const now = new Date(); const years = new Set();
-  records.forEach(r => { const y = parseInt(r.date.substring(0, 4)); if (!isNaN(y)) years.add(y); });
-  years.add(now.getFullYear()); const yearArr = [...years].sort((a, b) => b - a);
+  const now = new Date(); 
+  
+  // ⭐️ နှစ်ကို 2023 ကနေ 2030 အထိ ထည့်သွင်းပေးထားပါတယ် ⭐️
+  let yearArr = [];
+  for (let y = 2023; y <= 2030; y++) {
+    yearArr.push(y);
+  }
+  // Record တွေထဲမှာ တခြားနှစ်တွေ ပါနေရင်လည်း ထပ်တိုးမယ်
+  records.forEach(r => { 
+    const y = parseInt(r.date.substring(0, 4)); 
+    if (!isNaN(y) && !yearArr.includes(y)) yearArr.push(y); 
+  });
+  yearArr.sort((a, b) => b - a);
   
   const ySel = document.getElementById('reportYear'); 
   const mSel = document.getElementById('reportMonth');
@@ -840,38 +865,118 @@ function populateReportSelectors() {
   if (curY) ySel.value = curY; else ySel.value = now.getFullYear();
   if (curM) mSel.value = curM; else mSel.value = String(now.getMonth()+1).padStart(2,'0');
 }
+
 function renderMonthlyReport() {
   const y = document.getElementById('reportYear').value; 
   const m = document.getElementById('reportMonth').value; 
   const prefix = y + '-' + m;
-  const filtered = records.filter(r => r.date.startsWith(prefix));
   
-  const incomes = filtered.filter(r => r.type === 'income'); 
+  document.getElementById('reportMonthYearText').textContent = `လ - ${MONTH_NAMES[parseInt(m)-1]} ${y}`;
+
+  const filtered = records.filter(r => r.date.startsWith(prefix));
+  const incomes = filtered.filter(r => r.type === 'income');
   const expenses = filtered.filter(r => r.type === 'expense');
+  
   const totalInc = incomes.reduce((s, r) => s + r.amount, 0); 
   const totalExp = expenses.reduce((s, r) => s + r.amount, 0);
-  
-  const el = document.getElementById('monthlyReportResult');
-  if (filtered.length === 0) { el.innerHTML = '<div class="empty-msg">ဤလအတွက် မှတ်တမ်း မရှိပါ။</div>'; return; }
-  
-  let html = `<div class="table-summary">
-    <strong>${MONTH_NAMES[parseInt(m)-1]} ${y} လစဉ် အနှစ်ချုပ်</strong><br>
-    စုစုပေါင်း ဝင်ငွေ: <span class="income-color">${formatMoney(totalInc)}</span><br>
-    စုစုပေါင်း အသုံးစရိတ်: <span class="expense-color">${formatMoney(totalExp)}</span><br>
-    လက်ကျန်ငွေ: <span class="balance-color"><strong>${formatMoney(totalInc - totalExp)}</strong></span>
-  </div>`;
+  const netSaving = totalInc - totalExp;
 
-  const sorted = [...filtered].sort((a, b) => a.date.localeCompare(b.date));
-  html += '<table class="report-table"><tr><th>ရက်စွဲ</th><th>အမျိုးအစား</th><th>ဝင်ငွေ</th><th>အသုံးစရိတ်</th></tr>';
-  sorted.forEach(r => {
-    html += `<tr>
-      <td>${r.date.substring(8,10)}</td>
-      <td>${r.category}${r.note ? ' <span style="font-size:10px;color:#888;">('+r.note+')</span>' : ''}</td>
-      <td class="amount income-color">${r.type === 'income' ? formatMoney(r.amount) : '-'}</td>
-      <td class="amount expense-color">${r.type === 'expense' ? formatMoney(r.amount) : '-'}</td>
-    </tr>`;
-  });
-  html += '</table>';
+  const el = document.getElementById('monthlyReportResult');
+  
+  if (filtered.length === 0) { 
+    el.innerHTML = '<div class="empty-msg">ဤလအတွက် မှတ်တမ်း မရှိပါ။</div>'; 
+    return; 
+  }
+
+  // ရက်စွဲအလိုက် အစီအစဉ်ချခြင်း
+  const sortedInc = [...incomes].sort((a, b) => a.date.localeCompare(b.date));
+  const sortedExp = [...expenses].sort((a, b) => a.date.localeCompare(b.date));
+
+  let html = `
+    <table class="finance-table">
+      <thead>
+        <tr>
+          <th style="width: 15%;">ရက်စွဲ</th>
+          <th style="width: 25%;">အမျိုးအစား</th>
+          <th style="width: 35%;">အသေးစိတ်</th>
+          <th style="width: 25%;">ပမာဏ (Kyat)</th>
+        </tr>
+      </thead>
+      <tbody>
+        <!-- ဝင်ငွေ ကဏ္ဍ -->
+        <tr>
+          <td colspan="4" class="section-header income-header">ဝင်ငွေ</td>
+        </tr>
+  `;
+
+  if (sortedInc.length > 0) {
+    sortedInc.forEach(r => {
+      html += `
+        <tr>
+          <td class="text-center">${r.date.split('-')[2]}/${r.date.split('-')[1]}/${r.date.split('-')[0]}</td>
+          <td>${r.category}</td>
+          <td>${r.note || '-'}</td>
+          <td class="text-right">${formatMoney(r.amount)}</td>
+        </tr>
+      `;
+    });
+  } else {
+    html += `<tr><td colspan="4" class="text-center" style="color:#888;">ဝင်ငွေ မရှိပါ</td></tr>`;
+  }
+
+  html += `
+        <tr class="total-row">
+          <td colspan="3" class="text-center" style="color:#1a8917;">Total Income (ဝင်ငွေစုစုပေါင်း)</td>
+          <td class="text-right" style="color:#1a8917;">${formatMoney(totalInc)}</td>
+        </tr>
+        
+        <!-- အသုံးစရိတ် ကဏ္ဍ -->
+        <tr>
+          <td colspan="4" class="section-header expense-header">အသုံးစရိတ်</td>
+        </tr>
+  `;
+
+  if (sortedExp.length > 0) {
+    sortedExp.forEach(r => {
+      html += `
+        <tr>
+          <td class="text-center">${r.date.split('-')[2]}/${r.date.split('-')[1]}/${r.date.split('-')[0]}</td>
+          <td>${r.category}</td>
+          <td>${r.note || '-'}</td>
+          <td class="text-right">${formatMoney(r.amount)}</td>
+        </tr>
+      `;
+    });
+  } else {
+    html += `<tr><td colspan="4" class="text-center" style="color:#888;">အသုံးစရိတ် မရှိပါ</td></tr>`;
+  }
+
+  html += `
+        <tr class="total-row">
+          <td colspan="3" class="text-center" style="color:#d93025;">အသုံးစရိတ်စုစုပေါင်း (Total Expenses)</td>
+          <td class="text-right" style="color:#d93025;">${formatMoney(totalExp)}</td>
+        </tr>
+        
+        <!-- လက်ကျန်ငွေ ကဏ္ဍ -->
+        <tr>
+          <td colspan="4" class="section-header summary-header">ငွေစာရင်း အနှစ်ချုပ်</td>
+        </tr>
+        <tr>
+          <td colspan="3" class="text-center">ဝင်ငွေစုစုပေါင်း (Total Income)</td>
+          <td class="text-right" style="color:#1a8917;">${formatMoney(totalInc)}</td>
+        </tr>
+        <tr>
+          <td colspan="3" class="text-center">အသုံးစရိတ်စုစုပေါင်း (Total Expenses)</td>
+          <td class="text-right" style="color:#d93025;">${formatMoney(totalExp)}</td>
+        </tr>
+        <tr class="total-row">
+          <td colspan="3" class="text-center" style="color:#1a73e8;">ပိုလျှံငွေ/ထွက်ငွေ (Net Savings)</td>
+          <td class="text-right" style="color:#1a73e8;">${formatMoney(netSaving)}</td>
+        </tr>
+      </tbody>
+    </table>
+  `;
+  
   el.innerHTML = html;
 }
 
