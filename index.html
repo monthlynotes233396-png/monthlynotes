@@ -15,10 +15,9 @@
     font-family: 'Pyidaungsu', 'Myanmar Text', 'Segoe UI', sans-serif;
     background: #f0f2f5;
     color: #1c1e21;
-    padding-bottom: 110px;
+    padding-bottom: 130px;
   }
   
-  /* Header */
   .app-header {
     background: linear-gradient(135deg, #4b6cb7, #182848);
     color: #fff;
@@ -32,7 +31,6 @@
   .app-header h1 { font-size: 20px; font-weight: bold; }
   .app-header p { font-size: 12px; opacity: 0.85; margin-top: 4px; }
   
-  /* အကောင့်နာမည်နေရာ (Admin ၅ ချက်နှိပ်ရန်) */
   .user-info {
     position: absolute; top: 15px; right: 15px; font-size: 12px;
     background: rgba(255,255,255,0.2); padding: 8px 12px; border-radius: 20px;
@@ -43,7 +41,6 @@
 
   .container { max-width: 600px; margin: 0 auto; padding: 14px; }
 
-  /* ယနေ့ စာရင်း ကတ်များ */
   .summary-grid {
     display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 16px;
   }
@@ -57,7 +54,6 @@
   .expense-color { color: #d93025; }
   .balance-color { color: #1a73e8; }
 
-  /* မှတ်တမ်းအသစ်ထည့်ရန် ဖောင် */
   .form-box {
     background: #fff; border-radius: 16px; padding: 16px; margin-bottom: 16px;
     box-shadow: 0 4px 10px rgba(0,0,0,0.08);
@@ -92,7 +88,6 @@
   .save-btn:active { transform: scale(0.98); }
   .save-btn:disabled { background: #a0a0a0; cursor: not-allowed; box-shadow: none; }
 
-  /* မှတ်တမ်းစာရင်း */
   .list-box {
     background: #fff; border-radius: 16px; padding: 16px; margin-bottom: 16px;
     box-shadow: 0 2px 6px rgba(0,0,0,0.05);
@@ -113,7 +108,6 @@
   }
   .empty-msg { text-align: center; color: #8a8d91; font-size: 13px; padding: 16px 0; }
 
-  /* Tabs */
   .tabs { display: flex; gap: 6px; margin-bottom: 16px; }
   .tabs button {
     flex: 1; padding: 10px; border: none; border-radius: 10px; font-size: 13px;
@@ -125,7 +119,6 @@
   .tab-content.active { display: block; }
   @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
 
-  /* Reports & Admin */
   .report-box, .admin-box {
     background: #fff; border-radius: 16px; padding: 16px; margin-bottom: 16px;
     box-shadow: 0 2px 6px rgba(0,0,0,0.05);
@@ -144,7 +137,6 @@
   .report-table td.amount { text-align: right; font-weight: bold; }
   .table-summary { background: #f0f4ff; padding: 10px; border-radius: 8px; margin-bottom: 10px; font-size: 13px; line-height: 1.5; }
 
-  /* Admin Panel */
   .admin-box { border: 2px solid #4b6cb7; }
   .admin-box input { margin-bottom: 10px; }
   .video-preview { margin-top: 10px; border-radius: 8px; overflow: hidden; background: #000; text-align: center; }
@@ -156,28 +148,43 @@
   .video-item .vid-name { font-weight: bold; color: #182848; }
   .video-item .vid-meta { font-size: 11px; color: #8a8d91; margin-top: 2px; }
 
-  /* ကြော်ငြာနေရာ */
   .ad-container {
-    position: fixed; bottom: 0; left: 0; right: 0; background: #000;
-    border-top: 1px solid #e4e6eb; box-shadow: 0 -4px 15px rgba(0,0,0,0.2);
-    z-index: 1000; display: flex; flex-direction: column; width: 100%; max-height: 130px;
+    position: fixed; bottom: 0; left: 0; right: 0; background: #fff;
+    border-top: 1px solid #e4e6eb; box-shadow: 0 -4px 15px rgba(0,0,0,0.15);
+    z-index: 1000; display: flex; flex-direction: column; width: 100%;
   }
+  
+  .ticker-wrap {
+    width: 100%; overflow: hidden; background: #f8f9fa; border-bottom: 1px solid #ddd;
+    padding: 6px 0; white-space: nowrap; box-sizing: content-box; display: flex; align-items: center;
+  }
+  .ticker-title {
+    background: #4b6cb7; color: #fff; padding: 2px 8px; border-radius: 4px;
+    font-size: 11px; font-weight: bold; margin-left: 8px; flex-shrink: 0;
+  }
+  .ticker {
+    display: inline-block; white-space: nowrap; padding-left: 100%; 
+    animation: marquee 15s linear infinite; font-size: 13px; color: #182848; font-weight: bold;
+  }
+  @keyframes marquee {
+    0% { transform: translate(0, 0); }
+    100% { transform: translate(-100%, 0); }
+  }
+  
   .ad-video-wrapper {
-    position: relative; width: 100%; height: 100px; background: #000;
+    position: relative; width: 100%; height: 110px; background: #000;
     display: flex; justify-content: center; align-items: center; overflow: hidden;
   }
   .ad-video-wrapper video { width: 100%; height: 100%; object-fit: contain; }
   
-  .ad-overlay-info {
-    position: absolute; bottom: 0; left: 0; right: 0;
-    background: linear-gradient(to top, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.4) 60%, transparent 100%);
-    padding: 20px 10px 6px 10px; color: #fff; pointer-events: none; text-align: left;
+  .fullscreen-btn {
+    position: absolute; bottom: 8px; right: 8px; background: rgba(0,0,0,0.6);
+    color: #fff; border: 1px solid rgba(255,255,255,0.3); border-radius: 6px;
+    padding: 6px 10px; font-size: 14px; cursor: pointer; display: flex; align-items: center; gap: 4px;
   }
-  .ad-overlay-info .title { font-size: 12px; font-weight: bold; margin-bottom: 2px; }
-  .ad-overlay-info .desc { font-size: 10px; color: #ddd; }
-  .ad-placeholder { font-size: 11px; color: #8a8d91; width: 100%; padding: 15px; text-align: center; }
+  
+  .ad-placeholder { font-size: 11px; color: #8a8d91; width: 100%; padding: 20px; text-align: center; }
 
-  /* Modals */
   .modal-overlay {
     display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0;
     background: rgba(0,0,0,0.6); z-index: 2000; align-items: center; justify-content: center;
@@ -189,6 +196,7 @@
     box-shadow: 0 10px 30px rgba(0,0,0,0.2);
   }
   .modal-box h3 { font-size: 16px; margin-bottom: 12px; color: #182848; }
+  .modal-box p { font-size: 13px; color: #65676b; margin-bottom: 16px; line-height: 1.5; }
   .modal-box input {
     width: 100%; padding: 12px; border: 1.5px solid #ccd0d5; border-radius: 8px;
     font-size: 14px; margin-bottom: 10px; font-family: inherit; background: #f9f9f9;
@@ -220,12 +228,23 @@
 </head>
 <body>
 
+<!-- Custom Alert Modal -->
+<div class="modal-overlay" id="customAlertModal">
+  <div class="modal-box">
+    <h3 id="alertTitle">အသိပေးချက်</h3>
+    <p id="alertMessage"></p>
+    <div class="btn-row">
+      <button class="btn-primary" onclick="closeCustomAlert()">အဆင်ပြေသည်</button>
+    </div>
+  </div>
+</div>
+
 <!-- Auth Modal -->
 <div class="modal-overlay" id="authModal">
   <div class="modal-box">
     <div id="signupSection" style="display:none;">
       <h3>📝 အကောင့်အသစ်ဖွင့်ရန်</h3>
-      <p style="font-size:12px; color:#65676b; margin-bottom:12px;">ဖုန်းနံပါတ်တစ်ခုလျှင် အကောင့်တစ်ခုသာ ဖွင့်နိုင်ပါမည်။</p>
+      <p>ဖုန်းနံပါတ်တစ်ခုလျှင် အကောင့်တစ်ခုသာ ဖွင့်နိုင်ပါမည်။</p>
       <input type="text" id="signupName" placeholder="သင့်နာမည်">
       <input type="tel" id="signupPhone" placeholder="ဖုန်းနံပါတ် (09xxxxxxxxx)">
       <div class="btn-row">
@@ -236,7 +255,7 @@
 
     <div id="loginSection" style="display:none;">
       <h3>👋 ပြန်လည်ကြိုဆိုပါတယ်</h3>
-      <p style="font-size:12px; color:#65676b; margin-bottom:12px;">သင့်ဖုန်းနံပါတ်ဖြင့် ဝင်ရောက်ပါ</p>
+      <p>သင့်ဖုန်းနံပါတ်ဖြင့် ဝင်ရောက်ပါ</p>
       <input type="tel" id="loginPhone" placeholder="ဖုန်းနံပါတ် (09xxxxxxxxx)">
       <div class="btn-row">
         <button class="btn-primary" onclick="loginUser()">✅ ဝင်မည်</button>
@@ -250,9 +269,10 @@
 <div class="modal-overlay" id="adminLoginModal">
   <div class="modal-box">
     <h3>🔐 Admin Login</h3>
+    <p>Admin Panel ထဲသို့ ဝင်ရောက်ရန် Password ရိုက်ထည့်ပါ။</p>
     <input type="password" id="adminPassword" placeholder="Password ထည့်ပါ" onkeydown="if(event.key==='Enter') loginAdmin()">
     <div class="btn-row">
-      <button class="btn-cancel" onclick="closeAdminLogin()">မလုပ်တော့ပါ</button>
+      <button class="btn-cancel" onclick="closeAdminLogin()">ပိတ်မည်</button>
       <button class="btn-primary" onclick="loginAdmin()">ဝင်မည်</button>
     </div>
   </div>
@@ -262,7 +282,6 @@
 <div class="app-header">
   <h1>💰 ငွေစာရင်း</h1>
   <p>နေ့စဉ် ဝင်ငွေ / အသုံးစရိတ် မှတ်တမ်း</p>
-  <!-- အပေါ်ညာထောင့်က အကောင့်နာမည်နေရာကို ၅ ချက်နှိပ်ပါ -->
   <div class="user-info" onclick="handleAdminClick()">👤 <span id="displayUserName">User</span></div>
 </div>
 
@@ -280,7 +299,6 @@
       <span class="email-text">sithu233396@gmail.com</span>
     </div>
 
-    <!-- ယနေ့ စာရင်း -->
     <div class="summary-grid">
       <div class="summary-card">
         <div class="label">ယနေ့ ဝင်ငွေ</div>
@@ -296,10 +314,8 @@
       </div>
     </div>
 
-    <!-- မှတ်တမ်းအသစ် ထည့်ရန် -->
     <div class="form-box">
       <h3>➕ မှတ်တမ်းအသစ် ထည့်ရန်</h3>
-      
       <div class="type-toggle">
         <button id="btnIncome" class="active-income" onclick="setType('income')">🟢 ဝင်ငွေ</button>
         <button id="btnExpense" onclick="setType('expense')">🔴 အသုံးစရိတ်</button>
@@ -328,7 +344,6 @@
       <button class="save-btn" onclick="saveRecord()">✅ သိမ်းဆည်းမည်</button>
     </div>
 
-    <!-- ယခုလ စာရင်း -->
     <div class="month-box" style="background: #fff; border-radius: 16px; padding: 16px; margin-bottom: 16px; box-shadow: 0 2px 6px rgba(0,0,0,0.05); border-left: 5px solid #4b6cb7;">
       <h3 style="font-size: 15px; margin-bottom: 12px; color: #182848;">📅 ယခုလ စာရင်း (<span id="monthName"></span>)</h3>
       <div class="month-row" style="display: flex; justify-content: space-between; font-size: 13px; padding: 6px 0; border-bottom: 1px dashed #eee;"><span>စုစုပေါင်း ဝင်ငွေ</span><span class="income-color" id="monthIncome">0</span></div>
@@ -336,13 +351,11 @@
       <div class="month-row" style="display: flex; justify-content: space-between; font-size: 14px; padding-top: 10px;"><span><strong>လက်ကျန်ငွေ</strong></span><span class="balance-color" id="monthBalance"><strong>0</strong></span></div>
     </div>
 
-    <!-- မှတ်တမ်းစာရင်း -->
     <div class="list-box">
       <h3>📋 မှတ်တမ်းစာရင်း</h3>
       <div id="recordList"></div>
     </div>
     
-    <!-- Logout Button -->
     <button class="logout-main-btn" onclick="logoutUser()">🚪 အကောင့်မှ ထွက်မည် (Logout)</button>
   </div>
 
@@ -367,7 +380,7 @@
       <div style="background:#eef2ff; border:1px solid #c7d2fe; padding:12px; border-radius:8px; margin-bottom:16px;">
         <h4 style="font-size:14px; color:#1e3a8a; margin-bottom:6px;">☁️ ကြော်ငြာ Video တင်ရန်</h4>
         <p style="font-size:12px; color:#4b5563; margin-bottom:10px; line-height:1.4;">
-          Video ဖိုင် အရွယ်အစား ကန့်သတ်ချက် မရှိပါ။ တင်လိုက်တာနဲ့ အားလုံးမြင်နိုင်မည့် ကြော်ငြာနေရာတွင် ချက်ချင်း Update ဖြစ်သွားပါမည်။
+          <b style="color:red;">သတိပြုရန် -</b> ကြော်ငြာ ခေါင်းစဉ်နှင့် ဖော်ပြချက်များကို မဖြစ်မနေ ထည့်သွင်းပါ။ ၎င်းတို့သည် အောက်ခြေရှိ ကြော်ငြာနေရာတွင် စာတန်းထိုးအဖြစ် လှိမ့်ပြနေပါမည်။
         </p>
       </div>
 
@@ -377,12 +390,12 @@
       </div>
       
       <div class="form-group">
-        <label>ကြော်ငြာ ခေါင်းစဉ် (စာသား)</label>
+        <label>ကြော်ငြာ ခေါင်းစဉ် (မဖြစ်မနေထည့်ပါ)</label>
         <input type="text" id="adVideoTitle" placeholder="ဥပမာ - ABC ကုမ္ပဏီ">
       </div>
 
       <div class="form-group">
-        <label>ဖော်ပြချက် / လိပ်စာ (စာသား)</label>
+        <label>ဖော်ပြချက် / လိပ်စာ (မဖြစ်မနေထည့်ပါ)</label>
         <input type="text" id="adVideoDesc" placeholder="ဥပမာ - ပစ္စည်းများဝယ်ယူရန်">
       </div>
 
@@ -402,13 +415,19 @@
 
 <!-- ကြော်ငြာနေရာ -->
 <div class="ad-container" id="adContainer">
+  <div class="ticker-wrap" id="adTickerWrap" style="display:none;">
+    <span class="ticker-title">📢 ကြော်ငြာ</span>
+    <div class="ticker" id="tickerText"></div>
+  </div>
+  
   <div class="ad-video-wrapper" id="adVideoWrapper">
     <video id="adVideoPlayer" controls autoplay muted loop playsinline style="display:none;"></video>
-    <div class="ad-overlay-info" id="adOverlayInfo" style="display:none;">
-      <div class="title" id="overlayTitle"></div>
-      <div class="desc" id="overlayDesc"></div>
-    </div>
+    
+    <button class="fullscreen-btn" id="fullScreenBtn" style="display:none;" onclick="goFullScreen()">
+      ⛶ အကွက်ကျယ်
+    </button>
   </div>
+  
   <div class="ad-placeholder" id="adPlaceholder">
     📢 ကြော်ငြာနေရာ<br>
     <span style="font-size:10px;">ကြော်ငြာ ထည့်လိုပါက sithu233396@gmail.com သို့ ဆက်သွယ်ပါ</span>
@@ -447,16 +466,36 @@ window.addEventListener('DOMContentLoaded', () => {
   checkUserLogin();
 });
 
+/* ========== Custom Alert ========== */
+function showCustomAlert(title, message) {
+  document.getElementById('alertTitle').textContent = title;
+  document.getElementById('alertMessage').textContent = message;
+  document.getElementById('customAlertModal').classList.add('show');
+}
+function closeCustomAlert() {
+  document.getElementById('customAlertModal').classList.remove('show');
+}
+
 /* ========== ကြော်ငြာ Video စီမံခန့်ခွဲမှု ========== */
 async function loadAdVideos() {
   try {
-    const { data, error } = await _supabase.storage.from(BUCKET_NAME).list();
+    // ⭐️ includeMetadata: true ကို ထည့်ပေးလိုက်ပါပြီ ⭐️
+    const { data, error } = await _supabase.storage.from(BUCKET_NAME).list('', {
+      limit: 100,
+      offset: 0,
+      sortBy: { column: 'name', order: 'desc' },
+      includeMetadata: true
+    });
     if (error) throw error;
     
+    // 'ad_' နဲ့ စတဲ့ Video တွေကိုပဲ ယူမယ်
     adVideos = data.filter(file => file.name.startsWith('ad_'));
+    
+    // တင်ထားတဲ့အချိန်အလိုက် အစီအစဉ်ချမယ်
     adVideos.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
     
     if (adVideos.length > 0) {
+      adPlayIndex = 0; 
       playNextAd();
     } else {
       updateAdDisplay();
@@ -470,14 +509,15 @@ async function loadAdVideos() {
 function playNextAd() {
   const player = document.getElementById('adVideoPlayer');
   const placeholder = document.getElementById('adPlaceholder');
-  const overlay = document.getElementById('adOverlayInfo');
-  const titleEl = document.getElementById('overlayTitle');
-  const descEl = document.getElementById('overlayDesc');
+  const tickerWrap = document.getElementById('adTickerWrap');
+  const tickerText = document.getElementById('tickerText');
+  const fsBtn = document.getElementById('fullScreenBtn');
 
   if (adVideos.length === 0) {
     player.style.display = 'none';
     placeholder.style.display = 'block';
-    overlay.style.display = 'none';
+    tickerWrap.style.display = 'none';
+    fsBtn.style.display = 'none';
     return;
   }
 
@@ -485,13 +525,35 @@ function playNextAd() {
   const { data } = _supabase.storage.from(BUCKET_NAME).getPublicUrl(currentAd.name);
   const videoUrl = data.publicUrl;
 
-  titleEl.textContent = currentAd.name.split('_title_')[1] || 'ကြော်ငြာ';
-  descEl.textContent = currentAd.name.split('_desc_')[1] || '';
+  // Metadata ကို ယူမယ်
+  const title = currentAd.metadata?.title || '';
+  const desc = currentAd.metadata?.desc || '';
+  
+  let tickerString = '';
+  
+  if (title && desc) {
+    tickerString = `📢 ${title} - ${desc}`;
+  } else if (title) {
+    tickerString = `📢 ${title}`;
+  } else if (desc) {
+    tickerString = `📢 ${desc}`;
+  } else {
+    tickerString = `📢 ကြော်ငြာအသေးစိတ်သိရှိရန် ဆက်သွယ်ပါ။`;
+  }
+
+  tickerText.textContent = tickerString;
+  
+  // Animation ကို Reset ချပြီး ပြန်စေခြင်း
+  tickerText.style.animation = 'none';
+  tickerText.offsetHeight; 
+  tickerText.style.animation = 'marquee 15s linear infinite'; 
 
   player.src = videoUrl;
   player.style.display = 'block';
   placeholder.style.display = 'none';
-  overlay.style.display = 'block';
+  tickerWrap.style.display = 'flex';
+  fsBtn.style.display = 'flex';
+  
   player.play().catch(e => console.log("Autoplay blocked", e));
 
   player.onended = () => {
@@ -503,17 +565,32 @@ function playNextAd() {
 function updateAdDisplay() {
   const player = document.getElementById('adVideoPlayer');
   const placeholder = document.getElementById('adPlaceholder');
-  const overlay = document.getElementById('adOverlayInfo');
+  const tickerWrap = document.getElementById('adTickerWrap');
+  const fsBtn = document.getElementById('fullScreenBtn');
 
   if (adVideos.length > 0) {
     player.style.display = 'block';
     placeholder.style.display = 'none';
-    overlay.style.display = 'block';
+    tickerWrap.style.display = 'flex';
+    fsBtn.style.display = 'flex';
   } else {
     player.style.display = 'none';
     player.src = '';
     placeholder.style.display = 'block';
-    overlay.style.display = 'none';
+    tickerWrap.style.display = 'none';
+    fsBtn.style.display = 'none';
+  }
+}
+
+/* ========== အကွက်ကျယ် (Fullscreen) ========== */
+function goFullScreen() {
+  const elem = document.getElementById("adVideoWrapper");
+  if (elem.requestFullscreen) {
+    elem.requestFullscreen();
+  } else if (elem.webkitRequestFullscreen) {
+    elem.webkitRequestFullscreen();
+  } else if (elem.msRequestFullscreen) {
+    elem.msRequestFullscreen();
   }
 }
 
@@ -528,16 +605,25 @@ function handleAdVideoUpload(event) {
 }
 
 async function saveAdVideo() {
-  if (!pendingVideoFile) { alert('Video ဖိုင် ရွေးချယ်ပါ။'); return; }
+  if (!pendingVideoFile) { showCustomAlert('သတိပြုရန်', 'Video ဖိုင် ရွေးချယ်ပါ။'); return; }
+
+  const title = document.getElementById('adVideoTitle').value.trim();
+  const desc = document.getElementById('adVideoDesc').value.trim();
+  
+  if (!title) {
+    showCustomAlert('သတိပြုရန်', 'ကြော်ငြာ ခေါင်းစဉ် ထည့်သွင်းပါ။ (ဥပမာ - ABC ကုမ္ပဏီ)');
+    return;
+  }
+  if (!desc) {
+    showCustomAlert('သတိပြုရန်', 'ဖော်ပြချက် / လိပ်စာ ထည့်သွင်းပါ။ (ဥပမာ - ပစ္စည်းများဝယ်ယူရန်)');
+    return;
+  }
 
   const btn = document.getElementById('uploadVideoBtn');
   btn.textContent = 'တင်နေသည်... ခဏစောင့်ပါ';
   btn.disabled = true;
 
-  const title = document.getElementById('adVideoTitle').value.trim() || 'ကြော်ငြာ';
-  const desc = document.getElementById('adVideoDesc').value.trim() || '';
-  
-  const fileName = `ad_${Date.now()}_title_${title}_desc_${desc}.mp4`;
+  const fileName = `ad_${Date.now()}.mp4`;
 
   try {
     const { data, error } = await _supabase.storage
@@ -545,12 +631,16 @@ async function saveAdVideo() {
       .upload(fileName, pendingVideoFile, {
         cacheControl: '3600',
         upsert: false,
-        contentType: pendingVideoFile.type || 'video/mp4'
+        contentType: pendingVideoFile.type || 'video/mp4',
+        metadata: { 
+          title: title, 
+          desc: desc 
+        }
       });
 
     if (error) throw error;
 
-    alert('✅ ကြော်ငြာ Video ကို အောင်မြင်စွာ တင်ပြီးပါပြီ။');
+    showCustomAlert('အောင်မြင်ပါသည်', 'ကြော်ငြာ Video ကို အောင်မြင်စွာ တင်ပြီးပါပြီ။');
     
     pendingVideoFile = null;
     document.getElementById('adVideoPreview').style.display = 'none';
@@ -562,7 +652,7 @@ async function saveAdVideo() {
     renderAdVideoList();
 
   } catch (error) {
-    alert('❌ တင်မအောင်မြင်ပါ: ' + error.message);
+    showCustomAlert('မအောင်မြင်ပါ', 'တင်မအောင်မြင်ပါ: ' + error.message);
   } finally {
     btn.textContent = '📤 Video တင်မည်';
     btn.disabled = false;
@@ -574,7 +664,12 @@ async function renderAdVideoList() {
   el.innerHTML = '<div class="empty-msg">ဖတ်နေသည်...</div>';
 
   try {
-    const { data, error } = await _supabase.storage.from(BUCKET_NAME).list();
+    const { data, error } = await _supabase.storage.from(BUCKET_NAME).list('', {
+      limit: 100,
+      offset: 0,
+      sortBy: { column: 'name', order: 'desc' },
+      includeMetadata: true // ⭐️ ဒီနေရာမှာလည်း ထည့်ရပါမယ် ⭐️
+    });
     if (error) throw error;
     
     const videos = data.filter(file => file.name.startsWith('ad_'));
@@ -586,13 +681,13 @@ async function renderAdVideoList() {
     }
 
     el.innerHTML = videos.map(v => {
-      const title = v.name.split('_title_')[1] || 'ကြော်ငြာ';
-      const desc = v.name.split('_desc_')[1] || '';
+      const title = v.metadata?.title || 'ခေါင်းစဉ်မပါ';
+      const desc = v.metadata?.desc || 'ဖော်ပြချက်မပါ';
       return `
       <div class="video-item">
         <div class="vid-info">
           <div class="vid-name">🎬 ${title}</div>
-          <div class="vid-meta">${desc ? desc.substring(0, 20) + '...' : 'ဖော်ပြချက်မရှိ'}</div>
+          <div class="vid-meta">${desc}</div>
         </div>
         <button class="delete-btn" onclick="deleteAdVideo('${v.name}')">ဖျက်</button>
       </div>
@@ -608,11 +703,11 @@ async function deleteAdVideo(fileName) {
   try {
     const { error } = await _supabase.storage.from(BUCKET_NAME).remove([fileName]);
     if (error) throw error;
-    alert('✅ ဖျက်ပြီးပါပြီ။');
+    showCustomAlert('အောင်မြင်ပါသည်', 'ဖျက်ပြီးပါပြီ။');
     await loadAdVideos();
     renderAdVideoList();
   } catch (e) {
-    alert('❌ ဖျက်၍မရပါ: ' + e.message);
+    showCustomAlert('မအောင်မြင်ပါ', 'ဖျက်၍မရပါ: ' + e.message);
   }
 }
 
@@ -637,13 +732,13 @@ function checkUserLogin() {
 function registerUser() {
   const name = document.getElementById('signupName').value.trim();
   const phone = document.getElementById('signupPhone').value.trim();
-  if (!name) { alert('သင့်နာမည်ကို ထည့်သွင်းပါ။'); return; }
+  if (!name) { showCustomAlert('သတိပြုရန်', 'သင့်နာမည်ကို ထည့်သွင်းပါ။'); return; }
   if (!phone || (!phone.startsWith('09') && !phone.startsWith('၀၉'))) {
-    alert('မှန်ကန်သော မြန်မာဖုန်းနံပါတ် ထည့်ပါ။'); return;
+    showCustomAlert('သတိပြုရန်', 'မှန်ကန်သော မြန်မာဖုန်းနံပါတ် ထည့်ပါ။'); return;
   }
   const usersDB = getUsersDB();
   if (usersDB[phone]) {
-    alert('❌ ဤဖုန်းနံပါတ်ဖြင့် အကောင့်ဖွင့်ပြီးသား ဖြစ်ပါသည်။');
+    showCustomAlert('သတိပြုရန်', 'ဤဖုန်းနံပါတ်ဖြင့် အကောင့်ဖွင့်ပြီးသား ဖြစ်ပါသည်။');
     toggleAuthMode('login'); document.getElementById('loginPhone').value = phone; return;
   }
   usersDB[phone] = { name: name, phone: phone };
@@ -652,14 +747,14 @@ function registerUser() {
   document.getElementById('displayUserName').textContent = name;
   document.getElementById('authModal').classList.remove('show');
   records = []; localStorage.setItem(STORAGE_KEY + '_' + phone, JSON.stringify(records));
-  initAppData(); alert('✅ အကောင့်ဖွင့်ခြင်း အောင်မြင်ပါသည်။');
+  initAppData(); showCustomAlert('အောင်မြင်ပါသည်', 'အကောင့်ဖွင့်ခြင်း အောင်မြင်ပါသည်။');
 }
 function loginUser() {
   const phone = document.getElementById('loginPhone').value.trim();
-  if (!phone) { alert('ဖုန်းနံပါတ် ထည့်ပါ။'); return; }
+  if (!phone) { showCustomAlert('သတိပြုရန်', 'ဖုန်းနံပါတ် ထည့်ပါ။'); return; }
   const usersDB = getUsersDB();
   if (!usersDB[phone]) {
-    alert('❌ ဤဖုန်းနံပါတ်ဖြင့် အကောင့်မရှိပါ။ Sign Up အရင်လုပ်ပါ။');
+    showCustomAlert('သတိပြုရန်', 'ဤဖုန်းနံပါတ်ဖြင့် အကောင့်မရှိပါ။ Sign Up အရင်လုပ်ပါ။');
     toggleAuthMode('signup'); return;
   }
   localStorage.setItem(CURRENT_USER_KEY, JSON.stringify(usersDB[phone]));
@@ -676,7 +771,7 @@ function logoutUser() {
   }
 }
 
-/* ========== Admin Logic (၅ ချက်နှိပ်ခြင်း) ========== */
+/* ========== Admin Logic ========== */
 function handleAdminClick() {
   clickCount++;
   clearTimeout(clickTimer);
@@ -692,7 +787,7 @@ function openAdminLogin() {
   if (isAdminLoggedIn()) { 
     showAdminTab(); 
     switchTab('admin', document.getElementById('adminTabBtn')); 
-    alert('✅ Admin Panel ထဲသို့ ဝင်ရောက်ပြီးဖြစ်ပါသည်။');
+    showCustomAlert('အသိပေးချက်', 'Admin Panel ထဲသို့ ဝင်ရောက်ပြီးဖြစ်ပါသည်။');
     return; 
   }
   document.getElementById('adminPassword').value = '';
@@ -708,10 +803,10 @@ function loginAdmin() {
     closeAdminLogin(); 
     showAdminTab();
     switchTab('admin', document.getElementById('adminTabBtn')); 
-    alert('✅ အောင်မြင်ပါသည်။ Admin အဖြစ် ဝင်ရောက်ပြီးပါပြီ။');
+    showCustomAlert('အောင်မြင်ပါသည်', 'Admin အဖြစ် ဝင်ရောက်ပြီးပါပြီ။');
     renderAdVideoList();
   } else { 
-    alert('❌ Password မှားနေပါသည်။'); 
+    showCustomAlert('မှားယွင်းနေပါသည်', 'Password မှားနေပါသည်။ ပြန်ကြိုးစားပါ။'); 
   }
 }
 
@@ -755,13 +850,13 @@ function updateCategoryOptions() {
 }
 function saveRecord() {
   const currentUser = JSON.parse(localStorage.getItem(CURRENT_USER_KEY));
-  if (!currentUser) { alert('အရင်ဆုံး Login ဝင်ပါ။'); return; }
+  if (!currentUser) { showCustomAlert('သတိပြုရန်', 'အရင်ဆုံး Login ဝင်ပါ။'); return; }
   const amount = parseFloat(document.getElementById('amount').value);
   const category = document.getElementById('category').value;
   const date = document.getElementById('date').value;
   const note = document.getElementById('note').value.trim();
-  if (!amount || amount <= 0) { alert('ပမာဏ မှန်ကန်စွာ ထည့်ပါ။'); return; }
-  if (!date) { alert('ရက်စွဲ ရွေးပါ။'); return; }
+  if (!amount || amount <= 0) { showCustomAlert('သတိပြုရန်', 'ပမာဏ မှန်ကန်စွာ ထည့်ပါ။'); return; }
+  if (!date) { showCustomAlert('သတိပြုရန်', 'ရက်စွဲ ရွေးပါ။'); return; }
 
   records.push({ id: Date.now(), type: currentType, category, amount, date, note });
   localStorage.setItem(STORAGE_KEY + '_' + currentUser.phone, JSON.stringify(records));
@@ -770,7 +865,7 @@ function saveRecord() {
   document.getElementById('note').value = '';
   document.getElementById('amount').focus();
   renderAll();
-  alert('✅ မှတ်တမ်းကို အောင်မြင်စွာ သိမ်းဆည်းပြီးပါပြီ။');
+  showCustomAlert('အောင်မြင်ပါသည်', 'မှတ်တမ်းကို အောင်မြင်စွာ သိမ်းဆည်းပြီးပါပြီ။');
 }
 function deleteRecord(id) {
   const currentUser = JSON.parse(localStorage.getItem(CURRENT_USER_KEY));
