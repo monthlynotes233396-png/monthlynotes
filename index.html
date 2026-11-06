@@ -101,7 +101,7 @@
   .finance-table .text-right { text-align: right; }
   .finance-table .text-center { text-align: center; }
 
-  /* ⭐️ Admin Panel ကို ပိုမိုထင်ရှားစေရန် ပြင်ဆင်ထားသည် ⭐️ */
+  /* ⭐️ Admin Panel ⭐️ */
   .admin-box { border: 2px solid #4b6cb7; }
   .admin-title { font-size: 18px !important; color: #4b6cb7 !important; text-align: center; margin-bottom: 16px; border-bottom: 2px dashed #4b6cb7; padding-bottom: 10px; }
   .admin-info-box { background:#eef2ff; border:1px solid #c7d2fe; padding:12px; border-radius:8px; margin-bottom:16px; }
@@ -292,7 +292,7 @@
     <button class="logout-main-btn" onclick="logoutUser()">🚪 အကောင့်မှ ထွက်မည် (Logout)</button>
   </div>
 
-  <!-- ⭐️ REPORTS TAB (ပုံစံအသစ်) ⭐️ -->
+  <!-- REPORTS TAB -->
   <div id="tab-reports" class="tab-content">
     <div class="report-box">
       <h3 style="text-align: center; font-size: 16px; margin-bottom: 4px;">လစဉ် ဝင်ငွေနှင့် အသုံးစရိတ် တွက်ချက်မှုများ</h3>
@@ -308,7 +308,7 @@
     </div>
   </div>
 
-  <!-- ⭐️ ADMIN TAB (ခေါင်းစဉ်များ ပိုမိုထင်ရှားစေရန် ပြင်ဆင်ထားသည်) ⭐️ -->
+  <!-- ADMIN TAB -->
   <div id="tab-admin" class="tab-content">
     <div class="admin-box">
       <h3 class="admin-title">🔧 Admin Control Panel</h3>
@@ -414,6 +414,27 @@ function closeAuthModal() {
   document.getElementById('authModal').classList.remove('show');
 }
 
+/* =========================================================
+   ⭐️ စာသားများကို ဖိုင်နာမည်ထဲတွင် ကုဒ်ဖြင့် သိမ်းဆည်းခြင်း (Base64) 
+   (Supabase Metadata ပြဿနာကို ရာနှုန်းပြည့် ဖြေရှင်းရန်)
+   ========================================================= */
+function encodeText(text) {
+  try {
+    // Base64 ပြောင်းပြီး ဖိုင်နာမည်မှာ သုံးလို့ရအောင် URL Safe ဖြစ်စေမယ်
+    let b64 = btoa(unescape(encodeURIComponent(text)));
+    return b64.replace(/\+/g, '-').replace(/\//g, '_').replace(/=/g, '');
+  } catch(e) { return ""; }
+}
+
+function decodeText(base64) {
+  try {
+    // URL Safe ကနေ ပုံမှန် Base64 ပြန်ပြောင်းမယ်
+    let str = base64.replace(/-/g, '+').replace(/_/g, '/');
+    while (str.length % 4) { str += '='; }
+    return decodeURIComponent(escape(atob(str)));
+  } catch(e) { return ""; }
+}
+
 /* ========== ကြော်ငြာ Video စီမံခန့်ခွဲမှု ========== */
 async function loadAdVideos() {
   try {
@@ -459,9 +480,21 @@ function playNextAd() {
   const { data } = _supabase.storage.from(BUCKET_NAME).getPublicUrl(currentAd.name);
   const videoUrl = data.publicUrl;
 
-  let title = currentAd.metadata?.title || '';
-  let desc = currentAd.metadata?.desc || '';
+  // ⭐️ ဖိုင်နာမည်ထဲကနေ မြန်မာစာသားတွေကို ပြန်လည်ခွဲထုတ်ခြင်း ⭐️
+  let title = '';
+  let desc = '';
   
+  if (currentAd.name.includes('_title_')) {
+    const parts = currentAd.name.split('_title_');
+    const titleAndDesc = parts[1].split('_desc_');
+    title = decodeText(titleAndDesc[0]);
+    desc = titleAndDesc[1] ? decodeText(titleAndDesc[1].replace('.mp4', '')) : '';
+  } else {
+    // အရင်က တင်ထားတဲ့ ဖိုင်တွေအတွက် Metadata ကနေ ယူမယ်
+    title = currentAd.metadata?.title || '';
+    desc = currentAd.metadata?.desc || '';
+  }
+
   let tickerString = '';
   if (title && desc) {
     tickerString = `📢 ${title} - ${desc}`;
@@ -542,23 +575,17 @@ function handleAdVideoUpload(event) {
 async function saveAdVideo() {
   if (!pendingVideoFile) { showCustomAlert('သတိပြုရန်', 'Video ဖိုင် ရွေးချယ်ပါ။'); return; }
 
-  const title = document.getElementById('adVideoTitle').value.trim();
-  const desc = document.getElementById('adVideoDesc').value.trim();
-  
-  if (!title) {
-    showCustomAlert('သတိပြုရန်', 'ကြော်ငြာ ခေါင်းစဉ် ထည့်သွင်းပါ။');
-    return;
-  }
-  if (!desc) {
-    showCustomAlert('သတိပြုရန်', 'ဖော်ပြချက် / လိပ်စာ ထည့်သွင်းပါ။');
-    return;
-  }
+  const title = document.getElementById('adVideoTitle').value.trim() || 'ကြော်ငြာ အသစ်';
+  const desc = document.getElementById('adVideoDesc').value.trim() || 'အသေးစိတ်သိရှိရန် ဆက်သွယ်ပါ';
   
   const btn = document.getElementById('uploadVideoBtn');
   btn.textContent = 'တင်နေသည်... ခဏစောင့်ပါ';
   btn.disabled = true;
 
-  const fileName = `ad_${Date.now()}.mp4`;
+  // ⭐️ မြန်မာစာသားတွေကို Base64 ပြောင်းပြီး ဖိုင်နာမည်မှာ ထည့်သွင်းခြင်း ⭐️
+  const safeTitle = encodeText(title);
+  const safeDesc = encodeText(desc);
+  const fileName = `ad_${Date.now()}_title_${safeTitle}_desc_${safeDesc}.mp4`;
 
   try {
     const { data, error } = await _supabase.storage
@@ -613,8 +640,19 @@ async function renderAdVideoList() {
     }
 
     el.innerHTML = videos.map(v => {
-      const t = v.metadata?.title || 'ခေါင်းစဉ်မပါ';
-      const d = v.metadata?.desc || 'ဖော်ပြချက်မပါ';
+      let t = 'ခေါင်းစဉ်မပါ';
+      let d = 'ဖော်ပြချက်မပါ';
+      
+      if (v.name.includes('_title_')) {
+        const parts = v.name.split('_title_');
+        const td = parts[1].split('_desc_');
+        t = decodeText(td[0]) || t;
+        d = td[1] ? (decodeText(td[1].replace('.mp4', '')) || d) : d;
+      } else {
+        t = v.metadata?.title || t;
+        d = v.metadata?.desc || d;
+      }
+
       return `
       <div class="video-item">
         <div class="vid-info">
@@ -855,14 +893,11 @@ function renderAll() {
   `).join('');
 }
 
-/* ========== ⭐️ Reports (Image အတိုင်း ဇယားဆွဲခြင်း) ⭐️ ========== */
+/* ========== Reports (ပုံစံအသစ်) ========== */
 function populateReportSelectors() {
   const now = new Date(); 
-  
   let yearArr = [];
-  for (let y = 2023; y <= 2030; y++) {
-    yearArr.push(y);
-  }
+  for (let y = 2023; y <= 2030; y++) { yearArr.push(y); }
   records.forEach(r => { 
     const y = parseInt(r.date.substring(0, 4)); 
     if (!isNaN(y) && !yearArr.includes(y)) yearArr.push(y); 
