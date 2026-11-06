@@ -124,13 +124,12 @@
   }
   .ad-video-wrapper video { width: 100%; height: 100%; object-fit: contain; }
   
-  /* အကွက်ကျယ် ခလုတ် - အလွန်ထင်ရှားပြီး နှိပ်ရလွယ်အောင် ပြင်ထားသည် */
+  /* ⭐️ အကွက်ကျယ် ခလုတ်ကို အပေါ်ညာထောင့်သို့ ရွှေ့ထားသည် (Native Control တွေနဲ့ မထပ်စေရန်) ⭐️ */
   .fullscreen-btn {
-    position: absolute; bottom: 8px; right: 8px; background: rgba(0,0,0,0.8);
-    color: #fff; border: 1px solid rgba(255,255,255,0.6); border-radius: 8px;
-    padding: 8px 12px; font-size: 16px; cursor: pointer; 
-    display: flex; align-items: center; gap: 6px; z-index: 9999;
-    pointer-events: auto;
+    position: absolute; top: 8px; right: 8px; background: rgba(0,0,0,0.7);
+    color: #fff; border: 1px solid rgba(255,255,255,0.5); border-radius: 8px;
+    padding: 6px 10px; font-size: 14px; cursor: pointer; 
+    display: flex; align-items: center; gap: 4px; z-index: 9999;
   }
   .fullscreen-btn:active { background: rgba(0,0,0,1); }
   
@@ -295,7 +294,7 @@
       <div style="background:#eef2ff; border:1px solid #c7d2fe; padding:12px; border-radius:8px; margin-bottom:16px;">
         <h4 style="font-size:14px; color:#1e3a8a; margin-bottom:6px;">☁️ ကြော်ငြာ Video တင်ရန်</h4>
         <p style="font-size:12px; color:#4b5563; margin-bottom:10px; line-height:1.4;">
-          <b style="color:red;">သတိပြုရန် -</b> စာသားများ အတိအကျပေါ်စေရန် Video ဖိုင်နာမည်ထဲတွင် စာသားများကို ကုဒ်ဖြင့် သိမ်းဆည်းထားပါသည်။
+          စာသားများ အတိအကျပေါ်စေရန် Video ဖိုင်နာမည်ထဲတွင် စာသားများကို ကုဒ်ဖြင့် သိမ်းဆည်းထားပါသည်။
         </p>
       </div>
 
@@ -390,30 +389,17 @@ function closeCustomAlert() {
   document.getElementById('customAlertModal').classList.remove('show');
 }
 
-/* =========================================================
-   ⭐️ စာသားများကို ဖိုင်နာမည်ထဲတွင် ကုဒ်ဖြင့် သိမ်းဆည်းခြင်း (Base64) 
-   (Supabase Metadata ပြဿနာကို ရာနှုန်းပြည့် ဖြေရှင်းရန်)
-   ========================================================= */
-function encodeText(text) {
-  try { return btoa(unescape(encodeURIComponent(text))); } 
-  catch(e) { return ""; }
-}
-function decodeText(base64) {
-  try { return decodeURIComponent(escape(atob(base64))); } 
-  catch(e) { return ""; }
-}
-
 /* ========== ကြော်ငြာ Video စီမံခန့်ခွဲမှု ========== */
 async function loadAdVideos() {
   try {
     const { data, error } = await _supabase.storage.from(BUCKET_NAME).list('', {
       limit: 100,
       offset: 0,
-      sortBy: { column: 'name', order: 'desc' }
+      sortBy: { column: 'name', order: 'desc' },
+      includeMetadata: true 
     });
     if (error) throw error;
     
-    // 'ad_' နဲ့ စတဲ့ Video တွေကိုပဲ ယူမယ်
     adVideos = data.filter(file => file.name.startsWith('ad_'));
     adVideos.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
     
@@ -448,22 +434,17 @@ function playNextAd() {
   const { data } = _supabase.storage.from(BUCKET_NAME).getPublicUrl(currentAd.name);
   const videoUrl = data.publicUrl;
 
-  // ⭐️ ဖိုင်နာမည်ထဲကနေ စာသားတွေကို ပြန်လည်ခွဲထုတ်ခြင်း ⭐️
-  let title = '';
-  let desc = '';
+  // ⭐️ Metadata ထဲကနေ စာသားတွေ ယူမယ် ⭐️
+  let title = currentAd.metadata?.title || '';
+  let desc = currentAd.metadata?.desc || '';
   
-  if (currentAd.name.includes('_title_')) {
-    const parts = currentAd.name.split('_title_');
-    const titleAndDesc = parts[1].split('_desc_');
-    title = decodeText(titleAndDesc[0]);
-    desc = titleAndDesc[1] ? decodeText(titleAndDesc[1].replace('.mp4', '')) : '';
-  }
-
   let tickerString = '';
   if (title && desc) {
     tickerString = `📢 ${title} - ${desc}`;
   } else if (title) {
     tickerString = `📢 ${title}`;
+  } else if (desc) {
+    tickerString = `📢 ${desc}`;
   } else {
     tickerString = `📢 ကြော်ငြာအသေးစိတ်သိရှိရန် ဆက်သွယ်ပါ။`;
   }
@@ -546,10 +527,8 @@ async function saveAdVideo() {
   btn.textContent = 'တင်နေသည်... ခဏစောင့်ပါ';
   btn.disabled = true;
 
-  // ⭐️ စာသားများကို Base64 ပြောင်းပြီး ဖိုင်နာမည်မှာ ထည့်သွင်းခြင်း ⭐️
-  const safeTitle = encodeText(title).replace(/=/g, '');
-  const safeDesc = encodeText(desc).replace(/=/g, '');
-  const fileName = `ad_${Date.now()}_title_${safeTitle}_desc_${safeDesc}.mp4`;
+  // ⭐️ ဖိုင်နာမည်ကို အင်္ဂလိပ်စာလုံးနဲ့ နံပါတ်ပဲ သုံးမယ် (Error မတက်စေရန်) ⭐️
+  const fileName = `ad_${Date.now()}.mp4`;
 
   try {
     const { data, error } = await _supabase.storage
@@ -557,7 +536,9 @@ async function saveAdVideo() {
       .upload(fileName, pendingVideoFile, {
         cacheControl: '3600',
         upsert: false,
-        contentType: pendingVideoFile.type || 'video/mp4'
+        contentType: pendingVideoFile.type || 'video/mp4',
+        // စာသားတွေကို Metadata အနေနဲ့ သိမ်းမယ်
+        metadata: { title: title, desc: desc }
       });
 
     if (error) throw error;
@@ -589,7 +570,8 @@ async function renderAdVideoList() {
     const { data, error } = await _supabase.storage.from(BUCKET_NAME).list('', {
       limit: 100,
       offset: 0,
-      sortBy: { column: 'name', order: 'desc' }
+      sortBy: { column: 'name', order: 'desc' },
+      includeMetadata: true 
     });
     if (error) throw error;
     
@@ -602,14 +584,8 @@ async function renderAdVideoList() {
     }
 
     el.innerHTML = videos.map(v => {
-      let t = 'ခေါင်းစဉ်မပါ';
-      let d = 'ဖော်ပြချက်မပါ';
-      if (v.name.includes('_title_')) {
-        const parts = v.name.split('_title_');
-        const td = parts[1].split('_desc_');
-        t = decodeText(td[0]) || t;
-        d = td[1] ? (decodeText(td[1].replace('.mp4', '')) || d) : d;
-      }
+      const t = v.metadata?.title || 'ခေါင်းစဉ်မပါ';
+      const d = v.metadata?.desc || 'ဖော်ပြချက်မပါ';
       return `
       <div class="video-item">
         <div class="vid-info">
