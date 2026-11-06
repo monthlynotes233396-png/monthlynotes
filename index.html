@@ -101,7 +101,13 @@
   .finance-table .text-right { text-align: right; }
   .finance-table .text-center { text-align: center; }
 
+  /* ⭐️ Admin Panel ကို ပိုမိုထင်ရှားစေရန် ပြင်ဆင်ထားသည် ⭐️ */
   .admin-box { border: 2px solid #4b6cb7; }
+  .admin-title { font-size: 18px !important; color: #4b6cb7 !important; text-align: center; margin-bottom: 16px; border-bottom: 2px dashed #4b6cb7; padding-bottom: 10px; }
+  .admin-info-box { background:#eef2ff; border:1px solid #c7d2fe; padding:12px; border-radius:8px; margin-bottom:16px; }
+  .admin-info-box h4 { font-size: 15px; color: #1e3a8a; margin-bottom: 6px; font-weight: bold; }
+  .admin-info-box p { font-size: 12px; color: #4b5563; line-height: 1.4; }
+
   .admin-box input { margin-bottom: 10px; }
   .video-preview { margin-top: 10px; border-radius: 8px; overflow: hidden; background: #000; text-align: center; }
   .video-preview video { width: 100%; max-height: 150px; display: block; }
@@ -161,7 +167,7 @@
 </head>
 <body>
 
-<!-- Custom Alert Modal (ပိတ်ရန်ခလုတ်ပါဝင်သည်) -->
+<!-- Custom Alert Modal -->
 <div class="modal-overlay" id="customAlertModal">
   <div class="modal-box">
     <h3 id="alertTitle">အသိပေးချက်</h3>
@@ -302,14 +308,15 @@
     </div>
   </div>
 
-  <!-- ADMIN TAB -->
+  <!-- ⭐️ ADMIN TAB (ခေါင်းစဉ်များ ပိုမိုထင်ရှားစေရန် ပြင်ဆင်ထားသည်) ⭐️ -->
   <div id="tab-admin" class="tab-content">
     <div class="admin-box">
-      <h3>🔧 Admin Panel</h3>
-      <div style="background:#eef2ff; border:1px solid #c7d2fe; padding:12px; border-radius:8px; margin-bottom:16px;">
-        <h4 style="font-size:14px; color:#1e3a8a; margin-bottom:6px;">☁️ ကြော်ငြာ Video တင်ရန်</h4>
-        <p style="font-size:12px; color:#4b5563; margin-bottom:10px; line-height:1.4;">
-          စာသားများ အတိအကျပေါ်စေရန် Video ဖိုင်နာမည်ထဲတွင် စာသားများကို ကုဒ်ဖြင့် သိမ်းဆည်းထားပါသည်။
+      <h3 class="admin-title">🔧 Admin Control Panel</h3>
+      
+      <div class="admin-info-box">
+        <h4>☁️ ကြော်ငြာ Video တင်ရန်</h4>
+        <p>
+          ဤနေရာမှ တင်လိုက်သော Video သည် Supabase သို့ ရောက်သွားမည်ဖြစ်ပြီး အားလုံးမြင်နိုင်ရန် စာတန်းထိုးနှင့်အတူ ပြသပေးသွားမည် ဖြစ်ပါသည်။
         </p>
       </div>
 
@@ -319,12 +326,12 @@
       </div>
       
       <div class="form-group">
-        <label>ကြော်ငြာ ခေါင်းစဉ် (ကြိုက်တာရေးပါ)</label>
+        <label>ကြော်ငြာ ခေါင်းစဉ် (မဖြစ်မနေ ထည့်ပါ)</label>
         <input type="text" id="adVideoTitle" placeholder="ဥပမာ - ABC ကုမ္ပဏီ">
       </div>
 
       <div class="form-group">
-        <label>ဖော်ပြချက် / လိပ်စာ</label>
+        <label>ဖော်ပြချက် / လိပ်စာ (မဖြစ်မနေ ထည့်ပါ)</label>
         <input type="text" id="adVideoDesc" placeholder="ဥပမာ - ပစ္စည်းများဝယ်ယူရန်">
       </div>
 
@@ -334,10 +341,10 @@
 
       <button class="save-btn" id="uploadVideoBtn" onclick="saveAdVideo()" style="background:#1a8917; margin-top:12px;">📤 Video တင်မည်</button>
       
-      <h3 style="margin-top:20px;">📹 တင်ထားသော ကြော်ငြာများ</h3>
+      <h3 style="margin-top:24px; border-bottom: 1px solid #eee; padding-bottom: 8px;">📹 တင်ထားသော ကြော်ငြာများ</h3>
       <div id="adVideoList"></div>
 
-      <button class="save-btn" onclick="logoutAdmin()" style="background:#65676b; margin-top:16px;">🚪 Logout Admin</button>
+      <button class="save-btn" onclick="logoutAdmin()" style="background:#65676b; margin-top:24px;">🚪 Logout Admin</button>
     </div>
   </div>
 </div>
@@ -535,8 +542,17 @@ function handleAdVideoUpload(event) {
 async function saveAdVideo() {
   if (!pendingVideoFile) { showCustomAlert('သတိပြုရန်', 'Video ဖိုင် ရွေးချယ်ပါ။'); return; }
 
-  const title = document.getElementById('adVideoTitle').value.trim() || 'ကြော်ငြာ အသစ်';
-  const desc = document.getElementById('adVideoDesc').value.trim() || 'အသေးစိတ်သိရှိရန် ဆက်သွယ်ပါ';
+  const title = document.getElementById('adVideoTitle').value.trim();
+  const desc = document.getElementById('adVideoDesc').value.trim();
+  
+  if (!title) {
+    showCustomAlert('သတိပြုရန်', 'ကြော်ငြာ ခေါင်းစဉ် ထည့်သွင်းပါ။');
+    return;
+  }
+  if (!desc) {
+    showCustomAlert('သတိပြုရန်', 'ဖော်ပြချက် / လိပ်စာ ထည့်သွင်းပါ။');
+    return;
+  }
   
   const btn = document.getElementById('uploadVideoBtn');
   btn.textContent = 'တင်နေသည်... ခဏစောင့်ပါ';
@@ -843,12 +859,10 @@ function renderAll() {
 function populateReportSelectors() {
   const now = new Date(); 
   
-  // ⭐️ နှစ်ကို 2023 ကနေ 2030 အထိ ထည့်သွင်းပေးထားပါတယ် ⭐️
   let yearArr = [];
   for (let y = 2023; y <= 2030; y++) {
     yearArr.push(y);
   }
-  // Record တွေထဲမှာ တခြားနှစ်တွေ ပါနေရင်လည်း ထပ်တိုးမယ်
   records.forEach(r => { 
     const y = parseInt(r.date.substring(0, 4)); 
     if (!isNaN(y) && !yearArr.includes(y)) yearArr.push(y); 
@@ -888,7 +902,6 @@ function renderMonthlyReport() {
     return; 
   }
 
-  // ရက်စွဲအလိုက် အစီအစဉ်ချခြင်း
   const sortedInc = [...incomes].sort((a, b) => a.date.localeCompare(b.date));
   const sortedExp = [...expenses].sort((a, b) => a.date.localeCompare(b.date));
 
@@ -903,7 +916,6 @@ function renderMonthlyReport() {
         </tr>
       </thead>
       <tbody>
-        <!-- ဝင်ငွေ ကဏ္ဍ -->
         <tr>
           <td colspan="4" class="section-header income-header">ဝင်ငွေ</td>
         </tr>
@@ -930,7 +942,6 @@ function renderMonthlyReport() {
           <td class="text-right" style="color:#1a8917;">${formatMoney(totalInc)}</td>
         </tr>
         
-        <!-- အသုံးစရိတ် ကဏ္ဍ -->
         <tr>
           <td colspan="4" class="section-header expense-header">အသုံးစရိတ်</td>
         </tr>
@@ -957,7 +968,6 @@ function renderMonthlyReport() {
           <td class="text-right" style="color:#d93025;">${formatMoney(totalExp)}</td>
         </tr>
         
-        <!-- လက်ကျန်ငွေ ကဏ္ဍ -->
         <tr>
           <td colspan="4" class="section-header summary-header">ငွေစာရင်း အနှစ်ချုပ်</td>
         </tr>
