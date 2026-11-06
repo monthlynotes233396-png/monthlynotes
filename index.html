@@ -357,7 +357,8 @@
   </div>
   
   <div class="ad-video-wrapper" id="adVideoWrapper">
-    <video id="adVideoPlayer" controls autoplay muted loop playsinline style="display:none;"></video>
+    <!-- ⭐️ loop ကို ဖျက်ထားပါတယ် (ဒါမှ အလှည့်ကျ ပြောင်းလို့ရမှာပါ) ⭐️ -->
+    <video id="adVideoPlayer" controls autoplay muted playsinline style="display:none;"></video>
     <button class="fullscreen-btn" id="fullScreenBtn" style="display:none;" onclick="goFullScreen()">
       ⛶ အကွက်ကျယ်
     </button>
@@ -414,28 +415,22 @@ function closeAuthModal() {
   document.getElementById('authModal').classList.remove('show');
 }
 
-/* =========================================================
-   ⭐️ စာသားများကို ဖိုင်နာမည်ထဲတွင် ကုဒ်ဖြင့် သိမ်းဆည်းခြင်း (Base64) 
-   (Supabase Metadata ပြဿနာကို ရာနှုန်းပြည့် ဖြေရှင်းရန်)
-   ========================================================= */
+/* ========== စာသားများကို ဖိုင်နာမည်ထဲတွင် ကုဒ်ဖြင့် သိမ်းဆည်းခြင်း (Base64) ========== */
 function encodeText(text) {
   try {
-    // Base64 ပြောင်းပြီး ဖိုင်နာမည်မှာ သုံးလို့ရအောင် URL Safe ဖြစ်စေမယ်
     let b64 = btoa(unescape(encodeURIComponent(text)));
     return b64.replace(/\+/g, '-').replace(/\//g, '_').replace(/=/g, '');
   } catch(e) { return ""; }
 }
-
 function decodeText(base64) {
   try {
-    // URL Safe ကနေ ပုံမှန် Base64 ပြန်ပြောင်းမယ်
     let str = base64.replace(/-/g, '+').replace(/_/g, '/');
     while (str.length % 4) { str += '='; }
     return decodeURIComponent(escape(atob(str)));
   } catch(e) { return ""; }
 }
 
-/* ========== ကြော်ငြာ Video စီမံခန့်ခွဲမှု ========== */
+/* ========== ကြော်ငြာ Video စီမံခန့်ခွဲမှု (အလှည့်ကျပြသခြင်း) ========== */
 async function loadAdVideos() {
   try {
     const { data, error } = await _supabase.storage.from(BUCKET_NAME).list('', {
@@ -446,8 +441,15 @@ async function loadAdVideos() {
     });
     if (error) throw error;
     
+    // 'ad_' နဲ့ စတဲ့ Video တွေကိုပဲ ယူမယ်
     adVideos = data.filter(file => file.name.startsWith('ad_'));
-    adVideos.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+    
+    // ⭐️ ဖိုင်နာမည်မှာပါတဲ့ Timestamp အလိုက် စီမယ် (အသစ်ဆုံးကို အပေါ်မှာ ထားမယ်) ⭐️
+    adVideos.sort((a, b) => {
+      const timeA = parseInt(a.name.split('_')[1]) || 0;
+      const timeB = parseInt(b.name.split('_')[1]) || 0;
+      return timeB - timeA; 
+    });
     
     if (adVideos.length > 0) {
       adPlayIndex = 0; 
@@ -476,11 +478,14 @@ function playNextAd() {
     return;
   }
 
+  // Index က ကျော်သွားရင် ပြန်စမယ်
+  if (adPlayIndex >= adVideos.length) adPlayIndex = 0;
+
   const currentAd = adVideos[adPlayIndex];
   const { data } = _supabase.storage.from(BUCKET_NAME).getPublicUrl(currentAd.name);
   const videoUrl = data.publicUrl;
 
-  // ⭐️ ဖိုင်နာမည်ထဲကနေ မြန်မာစာသားတွေကို ပြန်လည်ခွဲထုတ်ခြင်း ⭐️
+  // စာသားများ ခွဲထုတ်ခြင်း
   let title = '';
   let desc = '';
   
@@ -490,7 +495,6 @@ function playNextAd() {
     title = decodeText(titleAndDesc[0]);
     desc = titleAndDesc[1] ? decodeText(titleAndDesc[1].replace('.mp4', '')) : '';
   } else {
-    // အရင်က တင်ထားတဲ့ ဖိုင်တွေအတွက် Metadata ကနေ ယူမယ်
     title = currentAd.metadata?.title || '';
     desc = currentAd.metadata?.desc || '';
   }
@@ -519,9 +523,17 @@ function playNextAd() {
   
   player.play().catch(e => console.log("Autoplay blocked", e));
 
+  // ⭐️ ဒီ Video ပြီးသွားရင် နောက်တစ်ခုကို အလှည့်ကျ ပြမယ် ⭐️
   player.onended = () => {
     adPlayIndex = (adPlayIndex + 1) % adVideos.length;
     playNextAd();
+  };
+
+  // ⭐️ Video မဖွင့်နိုင်ရင် ကျော်ပြီး နောက်တစ်ခုကို ပြမယ် (Error တက်ရင် အလုပ်မလုပ်တော့ဘဲ နေမှာ စိုးလို့) ⭐️
+  player.onerror = () => {
+    console.warn("Video Error, Skipping...");
+    adPlayIndex = (adPlayIndex + 1) % adVideos.length;
+    setTimeout(playNextAd, 1000); // ၁ စက္ကန့်နေပြီး နောက်တစ်ခုကို ပြမယ်
   };
 }
 
@@ -548,18 +560,11 @@ function updateAdDisplay() {
 /* ========== အကွက်ကျယ် (Fullscreen) ========== */
 function goFullScreen() {
   const video = document.getElementById('adVideoPlayer');
-  
-  if (video.requestFullscreen) {
-    video.requestFullscreen();
-  } else if (video.webkitRequestFullscreen) { /* Safari */
-    video.webkitRequestFullscreen();
-  } else if (video.webkitEnterFullscreen) { /* iOS Safari */
-    video.webkitEnterFullscreen();
-  } else if (video.msRequestFullscreen) { /* IE11 */
-    video.msRequestFullscreen();
-  } else {
-    showCustomAlert('အသိပေးချက်', 'သင့်ဖုန်း Browser က Fullscreen ကို မပံ့ပိုးထားပါ။');
-  }
+  if (video.requestFullscreen) video.requestFullscreen();
+  else if (video.webkitRequestFullscreen) video.webkitRequestFullscreen();
+  else if (video.webkitEnterFullscreen) video.webkitEnterFullscreen();
+  else if (video.msRequestFullscreen) video.msRequestFullscreen();
+  else showCustomAlert('အသိပေးချက်', 'သင့်ဖုန်း Browser က Fullscreen ကို မပံ့ပိုးထားပါ။');
 }
 
 let pendingVideoFile = null;
@@ -582,7 +587,6 @@ async function saveAdVideo() {
   btn.textContent = 'တင်နေသည်... ခဏစောင့်ပါ';
   btn.disabled = true;
 
-  // ⭐️ မြန်မာစာသားတွေကို Base64 ပြောင်းပြီး ဖိုင်နာမည်မှာ ထည့်သွင်းခြင်း ⭐️
   const safeTitle = encodeText(title);
   const safeDesc = encodeText(desc);
   const fileName = `ad_${Date.now()}_title_${safeTitle}_desc_${safeDesc}.mp4`;
@@ -632,7 +636,12 @@ async function renderAdVideoList() {
     if (error) throw error;
     
     const videos = data.filter(file => file.name.startsWith('ad_'));
-    videos.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+    
+    videos.sort((a, b) => {
+      const timeA = parseInt(a.name.split('_')[1]) || 0;
+      const timeB = parseInt(b.name.split('_')[1]) || 0;
+      return timeB - timeA; 
+    });
 
     if (videos.length === 0) {
       el.innerHTML = '<div class="empty-msg">Video မရှိသေးပါ။</div>';
@@ -752,7 +761,6 @@ function handleAdminClick() {
     clickTimer = setTimeout(() => { clickCount = 0; }, 2000); 
   }
 }
-
 function openAdminLogin() {
   if (isAdminLoggedIn()) { 
     showAdminTab(); 
@@ -764,9 +772,7 @@ function openAdminLogin() {
   document.getElementById('adminLoginModal').classList.add('show');
   setTimeout(() => document.getElementById('adminPassword').focus(), 100);
 }
-
 function closeAdminLogin() { document.getElementById('adminLoginModal').classList.remove('show'); }
-
 function loginAdmin() {
   if (document.getElementById('adminPassword').value === ADMIN_PASSWORD) {
     sessionStorage.setItem(ADMIN_SESSION_KEY, 'true'); 
@@ -779,14 +785,12 @@ function loginAdmin() {
     showCustomAlert('မှားယွင်းနေပါသည်', 'Password မှားနေပါသည်။ ပြန်ကြိုးစားပါ။'); 
   }
 }
-
 function logoutAdmin() {
   if (!confirm('Admin မှ ထွက်မှာ သေချာပါသလား?')) return;
   sessionStorage.removeItem(ADMIN_SESSION_KEY); 
   hideAdminTab();
   switchTab('main', document.querySelector('.tabs button'));
 }
-
 function isAdminLoggedIn() { return sessionStorage.getItem(ADMIN_SESSION_KEY) === 'true'; }
 function showAdminTab() { document.getElementById('adminTabBtn').style.display = ''; }
 function hideAdminTab() { 
@@ -893,7 +897,7 @@ function renderAll() {
   `).join('');
 }
 
-/* ========== Reports (ပုံစံအသစ်) ========== */
+/* ========== Reports ========== */
 function populateReportSelectors() {
   const now = new Date(); 
   let yearArr = [];
