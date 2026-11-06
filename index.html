@@ -15,7 +15,7 @@
     font-family: 'Pyidaungsu', 'Myanmar Text', 'Segoe UI', sans-serif;
     background: #f0f2f5;
     color: #1c1e21;
-    padding-bottom: 110px; /* Ad Space အတွက် နေရာချန်ထား */
+    padding-bottom: 110px;
   }
   
   /* Header */
@@ -26,17 +26,20 @@
     text-align: center;
     box-shadow: 0 3px 8px rgba(0,0,0,0.15);
     position: relative;
-    cursor: pointer; 
     border-bottom-left-radius: 16px;
     border-bottom-right-radius: 16px;
   }
   .app-header h1 { font-size: 20px; font-weight: bold; }
   .app-header p { font-size: 12px; opacity: 0.85; margin-top: 4px; }
+  
+  /* အကောင့်နာမည်နေရာ (Admin ၅ ချက်နှိပ်ရန်) */
   .user-info {
-    position: absolute; top: 15px; right: 15px; font-size: 11px;
-    background: rgba(255,255,255,0.2); padding: 5px 10px; border-radius: 20px;
-    cursor: pointer; font-weight: bold;
+    position: absolute; top: 15px; right: 15px; font-size: 12px;
+    background: rgba(255,255,255,0.2); padding: 8px 12px; border-radius: 20px;
+    cursor: pointer; font-weight: bold; user-select: none;
+    transition: background 0.2s;
   }
+  .user-info:active { background: rgba(255,255,255,0.4); }
 
   .container { max-width: 600px; margin: 0 auto; padding: 14px; }
 
@@ -54,7 +57,7 @@
   .expense-color { color: #d93025; }
   .balance-color { color: #1a73e8; }
 
-  /* မှတ်တမ်းအသစ်ထည့်ရန် ဖောင် (အပေါ်ရွှေ့ထားသည်) */
+  /* မှတ်တမ်းအသစ်ထည့်ရန် ဖောင် */
   .form-box {
     background: #fff; border-radius: 16px; padding: 16px; margin-bottom: 16px;
     box-shadow: 0 4px 10px rgba(0,0,0,0.08);
@@ -79,7 +82,6 @@
     border-color: #4b6cb7; outline: none; background: #fff;
   }
   
-  /* ပမာဏ ထည့်ရန် အကွက် */
   .amount-input { font-size: 24px !important; font-weight: bold; color: #182848; text-align: center; letter-spacing: 1px; padding: 16px 12px !important; }
   
   .save-btn {
@@ -136,7 +138,6 @@
   }
   .report-controls button { background: #4b6cb7; color: #fff; border: none; }
   
-  /* လစဉ်ဇယား */
   .report-table { width: 100%; border-collapse: collapse; font-size: 12px; margin-top: 8px; }
   .report-table th, .report-table td { padding: 8px 6px; border-bottom: 1px solid #eee; text-align: left; }
   .report-table th { background: #f8f9fa; font-weight: bold; color: #182848; }
@@ -155,19 +156,18 @@
   .video-item .vid-name { font-weight: bold; color: #182848; }
   .video-item .vid-meta { font-size: 11px; color: #8a8d91; margin-top: 2px; }
 
-  /* ကြော်ငြာနေရာ (ပိုမိုကျဉ်းမြောင်းစေရန်) */
+  /* ကြော်ငြာနေရာ */
   .ad-container {
     position: fixed; bottom: 0; left: 0; right: 0; background: #000;
     border-top: 1px solid #e4e6eb; box-shadow: 0 -4px 15px rgba(0,0,0,0.2);
-    z-index: 1000; display: flex; flex-direction: column; width: 100%; max-height: 130px; /* အမြင့်လျှော့ချထားသည် */
+    z-index: 1000; display: flex; flex-direction: column; width: 100%; max-height: 130px;
   }
   .ad-video-wrapper {
-    position: relative; width: 100%; height: 100px; /* အမြင့်လျှော့ချထားသည် */
-    background: #000; display: flex; justify-content: center; align-items: center; overflow: hidden;
+    position: relative; width: 100%; height: 100px; background: #000;
+    display: flex; justify-content: center; align-items: center; overflow: hidden;
   }
   .ad-video-wrapper video { width: 100%; height: 100%; object-fit: contain; }
   
-  /* Video ပေါ်က စာသား */
   .ad-overlay-info {
     position: absolute; bottom: 0; left: 0; right: 0;
     background: linear-gradient(to top, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.4) 60%, transparent 100%);
@@ -209,6 +209,12 @@
   .email-text {
     display: inline-block; background: #fff; padding: 4px 10px; border-radius: 6px;
     margin-top: 6px; border: 1px solid #c7d2fe; font-family: monospace; font-size: 13px; font-weight: bold;
+  }
+  
+  .logout-main-btn {
+    width: 100%; padding: 12px; background: #f0f2f5; color: #d93025;
+    border: 1px solid #ccd0d5; border-radius: 10px; font-size: 14px; font-weight: bold; cursor: pointer;
+    margin-top: 10px;
   }
 </style>
 </head>
@@ -253,10 +259,11 @@
 </div>
 
 <!-- Header -->
-<div class="app-header" onclick="handleAdminClick()">
+<div class="app-header">
   <h1>💰 ငွေစာရင်း</h1>
   <p>နေ့စဉ် ဝင်ငွေ / အသုံးစရိတ် မှတ်တမ်း</p>
-  <div class="user-info" id="headerUserInfo" onclick="event.stopPropagation(); logoutUser()">👤 <span id="displayUserName">User</span></div>
+  <!-- အပေါ်ညာထောင့်က အကောင့်နာမည်နေရာကို ၅ ချက်နှိပ်ပါ -->
+  <div class="user-info" onclick="handleAdminClick()">👤 <span id="displayUserName">User</span></div>
 </div>
 
 <div class="container">
@@ -289,7 +296,7 @@
       </div>
     </div>
 
-    <!-- မှတ်တမ်းအသစ် ထည့်ရန် (အပေါ်ရွှေ့ထားသည်) -->
+    <!-- မှတ်တမ်းအသစ် ထည့်ရန် -->
     <div class="form-box">
       <h3>➕ မှတ်တမ်းအသစ် ထည့်ရန်</h3>
       
@@ -322,11 +329,11 @@
     </div>
 
     <!-- ယခုလ စာရင်း -->
-    <div class="month-box">
-      <h3>📅 ယခုလ စာရင်း (<span id="monthName"></span>)</h3>
-      <div class="month-row"><span>စုစုပေါင်း ဝင်ငွေ</span><span class="income-color" id="monthIncome">0</span></div>
-      <div class="month-row"><span>စုစုပေါင်း အသုံးစရိတ်</span><span class="expense-color" id="monthExpense">0</span></div>
-      <div class="month-row"><span><strong>လက်ကျန်ငွေ</strong></span><span class="balance-color" id="monthBalance"><strong>0</strong></span></div>
+    <div class="month-box" style="background: #fff; border-radius: 16px; padding: 16px; margin-bottom: 16px; box-shadow: 0 2px 6px rgba(0,0,0,0.05); border-left: 5px solid #4b6cb7;">
+      <h3 style="font-size: 15px; margin-bottom: 12px; color: #182848;">📅 ယခုလ စာရင်း (<span id="monthName"></span>)</h3>
+      <div class="month-row" style="display: flex; justify-content: space-between; font-size: 13px; padding: 6px 0; border-bottom: 1px dashed #eee;"><span>စုစုပေါင်း ဝင်ငွေ</span><span class="income-color" id="monthIncome">0</span></div>
+      <div class="month-row" style="display: flex; justify-content: space-between; font-size: 13px; padding: 6px 0; border-bottom: 1px dashed #eee;"><span>စုစုပေါင်း အသုံးစရိတ်</span><span class="expense-color" id="monthExpense">0</span></div>
+      <div class="month-row" style="display: flex; justify-content: space-between; font-size: 14px; padding-top: 10px;"><span><strong>လက်ကျန်ငွေ</strong></span><span class="balance-color" id="monthBalance"><strong>0</strong></span></div>
     </div>
 
     <!-- မှတ်တမ်းစာရင်း -->
@@ -334,6 +341,9 @@
       <h3>📋 မှတ်တမ်းစာရင်း</h3>
       <div id="recordList"></div>
     </div>
+    
+    <!-- Logout Button -->
+    <button class="logout-main-btn" onclick="logoutUser()">🚪 အကောင့်မှ ထွက်မည် (Logout)</button>
   </div>
 
   <!-- REPORTS TAB -->
@@ -429,15 +439,15 @@ let records = [];
 let currentType = 'income';
 let clickCount = 0;
 let clickTimer = null;
-let adVideos = []; // ကြော်ငြာ Video များ သိမ်းရန် Array
-let adPlayIndex = 0; // အလှည့်ကျပြသရန် Index
+let adVideos = []; 
+let adPlayIndex = 0; 
 
 window.addEventListener('DOMContentLoaded', () => {
   loadAdVideos();
   checkUserLogin();
 });
 
-/* ========== ကြော်ငြာ Video စီမံခန့်ခွဲမှု (အလှည့်ကျပြသခြင်း) ========== */
+/* ========== ကြော်ငြာ Video စီမံခန့်ခွဲမှု ========== */
 async function loadAdVideos() {
   try {
     const { data, error } = await _supabase.storage.from(BUCKET_NAME).list();
@@ -475,7 +485,6 @@ function playNextAd() {
   const { data } = _supabase.storage.from(BUCKET_NAME).getPublicUrl(currentAd.name);
   const videoUrl = data.publicUrl;
 
-  // စာသားများ ပြင်ဆင်ခြင်း
   titleEl.textContent = currentAd.name.split('_title_')[1] || 'ကြော်ငြာ';
   descEl.textContent = currentAd.name.split('_desc_')[1] || '';
 
@@ -485,7 +494,6 @@ function playNextAd() {
   overlay.style.display = 'block';
   player.play().catch(e => console.log("Autoplay blocked", e));
 
-  // အလှည့်ကျ ပြောင်းရန် Event ထည့်ခြင်း
   player.onended = () => {
     adPlayIndex = (adPlayIndex + 1) % adVideos.length;
     playNextAd();
@@ -529,7 +537,6 @@ async function saveAdVideo() {
   const title = document.getElementById('adVideoTitle').value.trim() || 'ကြော်ငြာ';
   const desc = document.getElementById('adVideoDesc').value.trim() || '';
   
-  // ဖိုင်နာမည်တွင် Title နှင့် Desc ကို ပေါင်းစပ်သိမ်းဆည်းမည်
   const fileName = `ad_${Date.now()}_title_${title}_desc_${desc}.mp4`;
 
   try {
@@ -545,7 +552,6 @@ async function saveAdVideo() {
 
     alert('✅ ကြော်ငြာ Video ကို အောင်မြင်စွာ တင်ပြီးပါပြီ။');
     
-    // Reset
     pendingVideoFile = null;
     document.getElementById('adVideoPreview').style.display = 'none';
     document.getElementById('adVideoFile').value = '';
@@ -670,13 +676,18 @@ function logoutUser() {
   }
 }
 
-/* ========== Admin Logic ========== */
+/* ========== Admin Logic (၅ ချက်နှိပ်ခြင်း) ========== */
 function handleAdminClick() {
   clickCount++;
   clearTimeout(clickTimer);
-  if (clickCount >= 5) { clickCount = 0; openAdminLogin(); } 
-  else { clickTimer = setTimeout(() => { clickCount = 0; }, 2000); }
+  if (clickCount >= 5) { 
+    clickCount = 0; 
+    openAdminLogin(); 
+  } else { 
+    clickTimer = setTimeout(() => { clickCount = 0; }, 2000); 
+  }
 }
+
 function openAdminLogin() {
   if (isAdminLoggedIn()) { 
     showAdminTab(); 
@@ -688,7 +699,9 @@ function openAdminLogin() {
   document.getElementById('adminLoginModal').classList.add('show');
   setTimeout(() => document.getElementById('adminPassword').focus(), 100);
 }
+
 function closeAdminLogin() { document.getElementById('adminLoginModal').classList.remove('show'); }
+
 function loginAdmin() {
   if (document.getElementById('adminPassword').value === ADMIN_PASSWORD) {
     sessionStorage.setItem(ADMIN_SESSION_KEY, 'true'); 
@@ -701,12 +714,14 @@ function loginAdmin() {
     alert('❌ Password မှားနေပါသည်။'); 
   }
 }
+
 function logoutAdmin() {
   if (!confirm('Admin မှ ထွက်မှာ သေချာပါသလား?')) return;
   sessionStorage.removeItem(ADMIN_SESSION_KEY); 
   hideAdminTab();
   switchTab('main', document.querySelector('.tabs button'));
 }
+
 function isAdminLoggedIn() { return sessionStorage.getItem(ADMIN_SESSION_KEY) === 'true'; }
 function showAdminTab() { document.getElementById('adminTabBtn').style.display = ''; }
 function hideAdminTab() { 
